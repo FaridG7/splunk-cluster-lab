@@ -10,5 +10,8 @@ terraform {
 
 module "tier" {
   source = "./modules/tier"
-  name   = "mgmt"
+
+  name                = "mgmt"
+  ssh_public_key_path = "../keys/id_rsa.pub"
+  network_address     = "192.168.10.0/24"
 }

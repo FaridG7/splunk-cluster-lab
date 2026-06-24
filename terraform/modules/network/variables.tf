@@ -1,6 +1,7 @@
 variable "name" {
   type = string
 }
-variable "ips" {
-  type = map(string)
+variable "cidr_address" {
+  description = "Network in CIDR notation, e.g. 192.168.10.0/24"
+  type        = string
 }

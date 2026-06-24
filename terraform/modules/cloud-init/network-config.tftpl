@@ -1,0 +1,9 @@
+version: 2
+ethernets:
+  id0:
+    set-name: eth0
+    addresses:
+      - ${ip_address}/${prefix_length}
+    gateway4: ${gateway}
+    nameservers:
+      addresses: [${dns}]
