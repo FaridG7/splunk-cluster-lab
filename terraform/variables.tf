@@ -19,4 +19,8 @@ variable "ssh_public_key_path" {
   description = "The path to the public key that is injected in every VM"
   type        = string
 }
-
+variable "ansible_inventory_path" {
+  description = "Path where the Ansible inventory file will be written"
+  type        = string
+  default     = "../ansible/inventory.ini"
+}
