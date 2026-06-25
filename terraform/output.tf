@@ -6,12 +6,16 @@ resource "local_file" "ansible_inventory" {
         ["[${tier_name}]"],
         [
           for host, ip in tier_mod.domains :
-          "${host} ansible_host=${ip} ansible_user=ansible"
+          "${host} ansible_host=${ip}"
         ],
         [""]
       )
     ],
     ["[all:children]"],
-    [for tier_name, _ in module.tier : tier_name]
+    [for tier_name, _ in module.tier : tier_name],
+    [""],
+    ["[all:vars]"],
+    ["ansible_user=ansible"],
+    ["ansible_ssh_private_key_file=${var.ssh_keys.private_key_path}"],
   ]))
 }

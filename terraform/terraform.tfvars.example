@@ -1,4 +1,7 @@
-ssh_public_key_path = "../keys/id_rsa.pub"
+ssh_keys = {
+    public_key_path = "../keys/id_rsa.pub"
+    private_key_path = "../keys/id_rsa"
+  }
 tiers = [{
   name            = "mgmt"
   network_address = "192.168.10.0/24"

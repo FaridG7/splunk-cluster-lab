@@ -15,9 +15,12 @@ variable "pool" {
   type        = string
   default     = "default"
 }
-variable "ssh_public_key_path" {
-  description = "The path to the public key that is injected in every VM"
-  type        = string
+variable "ssh_keys" {
+  description = "The path to the public & private keys that are used for ssh"
+  type = object({
+    private_key_path = string
+    public_key_path  = string
+  })
 }
 variable "ansible_inventory_path" {
   description = "Path where the Ansible inventory file will be written"

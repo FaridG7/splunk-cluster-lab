@@ -43,7 +43,7 @@ module "tier" {
     vcpu                = each.value.vcpu
     capacity            = each.value.capacity
     pool                = var.pool
-    ssh_public_key_path = var.ssh_public_key_path
+    ssh_public_key_path = var.ssh_keys.public_key_path
     base_volume_path    = libvirt_volume.base.path
   }
 }
