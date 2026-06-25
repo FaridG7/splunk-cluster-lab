@@ -15,3 +15,11 @@ module "cloud-init" {
   gateway             = module.network.gateway
   dns                 = module.network.dns
 }
+
+module "root-volume" {
+  source = "../root-volume/"
+
+  name            = var.name
+  base_image_path = "./iso/noble-server-cloudimg-amd64.img"
+  capacity        = 40
+}
