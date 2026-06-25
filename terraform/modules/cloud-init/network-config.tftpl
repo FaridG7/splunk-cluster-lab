@@ -1,6 +1,8 @@
 version: 2
 ethernets:
-  id0:
+  all-en:
+    match:
+      name: "en*"
     set-name: eth0
     addresses:
       - ${ip_address}/${prefix_length}
