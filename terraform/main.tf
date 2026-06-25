@@ -14,7 +14,7 @@ module "tier" {
   spec = {
     name                = "idx"
     pool                = "default"
-    base_image_path     = "./iso/noble-server-cloudimg-amd64.img"
+    base_image_path     = "./iso/noble-server-cloudimg-amd64-qemu-guest-agent.qcow2"
     ssh_public_key_path = "../keys/id_rsa.pub"
     network_address     = "192.168.10.0/24"
   }
