@@ -79,10 +79,9 @@ resource "libvirt_domain" "webserver-vm" {
             network = var.spec.network_name
           }
         }
-        # wait_for_ip = {
-        #   source  = "agent"
-        #   timeout = 600
-        # }
+        wait_for_ip = {
+          source = "agent"
+        }
       }
     ]
     consoles = [
