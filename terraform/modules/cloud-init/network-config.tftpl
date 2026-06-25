@@ -3,7 +3,6 @@ ethernets:
   all-en:
     match:
       name: "en*"
-    set-name: eth0
     addresses:
       - ${ip_address}/${prefix_length}
     gateway4: ${gateway}
