@@ -21,7 +21,7 @@ resource "libvirt_volume" "root_disk" {
   name          = "${var.name}-root.qcow2"
   pool          = "default"
   capacity      = var.capacity
-  capacity_unit = "G"
+  capacity_unit = "GiB"
   target = {
     format = {
       type = "qcow2"
