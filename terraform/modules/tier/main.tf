@@ -22,7 +22,7 @@ module "domain" {
     cloud_init = {
       ssh_public_key_path = var.spec.ssh_public_key_path
       ip = {
-        address       = cidrhost(module.network.cidr_address, var.spec.offset + count.index)
+        address       = cidrhost(module.network.cidr_address, var.spec.ip_offset + count.index)
         prefix_length = split("/", module.network.cidr_address)[1]
         gateway       = module.network.gateway
         dns           = module.network.dns

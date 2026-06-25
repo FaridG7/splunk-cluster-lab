@@ -27,15 +27,19 @@ resource "libvirt_volume" "base" {
 
 
 module "tier" {
-  source = "./modules/tier"
+  source   = "./modules/tier"
+  for_each = { for t in var.tiers : t.name => t }
 
   spec = {
-    name                = "idx"
-    pool                = "default"
+    name                = each.value.name
+    network_address     = each.value.network_address
+    ip_offset           = each.value.ip_offset
+    domain_count        = each.value.domain_count
+    memory              = each.value.memory
+    vcpu                = each.value.vcpu
+    capacity            = each.value.capacity
+    pool                = var.pool
+    ssh_public_key_path = var.ssh_public_key_path
     base_volume_path    = libvirt_volume.base.path
-    ssh_public_key_path = "../keys/id_rsa.pub"
-    network_address     = "192.168.10.0/24"
-    offset              = 100
-    domain_count        = 2
   }
 }
