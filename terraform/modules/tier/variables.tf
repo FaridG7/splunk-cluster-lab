@@ -3,9 +3,13 @@ variable "spec" {
   type = object({
     name                = string
     pool                = string
-    base_image_path     = string
+    base_volume_path    = string
     ssh_public_key_path = string
     network_address     = string
+    domain_count        = number
+    memory              = optional(number, 4096)
+    vcpu                = optional(number, 4)
+    capacity            = optional(number, 40)
   })
 
 }

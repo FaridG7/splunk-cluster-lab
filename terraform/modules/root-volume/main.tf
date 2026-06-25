@@ -1,21 +1,4 @@
-resource "libvirt_volume" "base" {
-  name = "${var.spec.name}-base.qcow2"
-  pool = var.spec.pool
-
-  target = {
-    format = {
-      type = "qcow2"
-    }
-  }
-
-  create = {
-    content = {
-      url = var.spec.base_image_path
-    }
-  }
-}
-
-resource "libvirt_volume" "root_disk" {
+resource "libvirt_volume" "this" {
   name          = "${var.spec.name}-root.qcow2"
   pool          = var.spec.pool
   capacity      = var.spec.capacity
@@ -26,7 +9,7 @@ resource "libvirt_volume" "root_disk" {
     }
   }
   backing_store = {
-    path = libvirt_volume.base.path
+    path = var.spec.base_volume_path
     format = {
       type = "qcow2"
     }

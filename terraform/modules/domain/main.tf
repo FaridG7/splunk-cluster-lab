@@ -2,10 +2,10 @@ module "root_volume" {
   source = "../root-volume"
 
   spec = {
-    name            = var.spec.name
-    pool            = var.spec.pool
-    base_image_path = var.spec.base_image_path
-    capacity        = var.spec.capacity
+    name             = var.spec.name
+    pool             = var.spec.pool
+    base_volume_path = var.spec.base_volume_path
+    capacity         = var.spec.capacity
   }
 }
 module "cloud_init_volume" {
@@ -24,7 +24,7 @@ module "cloud_init_volume" {
   }
 }
 
-resource "libvirt_domain" "webserver-vm" {
+resource "libvirt_domain" "this" {
   name        = var.spec.name
   memory      = var.spec.memory
   memory_unit = "MiB"
