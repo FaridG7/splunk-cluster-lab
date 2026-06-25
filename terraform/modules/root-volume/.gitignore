@@ -5,5 +5,3 @@ terraform.tfstate.backup
 
 *.tfvars
 *.tfvars.json
-
-iso/*
