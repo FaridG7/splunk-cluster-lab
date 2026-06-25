@@ -35,6 +35,7 @@ module "tier" {
     base_volume_path    = libvirt_volume.base.path
     ssh_public_key_path = "../keys/id_rsa.pub"
     network_address     = "192.168.10.0/24"
+    offset              = 100
     domain_count        = 2
   }
 }
