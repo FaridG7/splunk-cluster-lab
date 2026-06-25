@@ -16,3 +16,11 @@ provider "registry.terraform.io/hashicorp/local" {
     "h1:9rBZCMNpxKwMlRbWH2QpwD3kqUCAejdOZQ/aiiDObXQ=",
   ]
 }
+
+provider "registry.terraform.io/hashicorp/null" {
+  version     = "3.3.0"
+  constraints = "~> 3.0"
+  hashes = [
+    "h1:l+dm3lhmu4ys7GbvIldfn544olSPH0DOiYruuFSfQkY=",
+  ]
+}

@@ -8,6 +8,10 @@ terraform {
       source  = "hashicorp/local"
       version = "~> 2.0"
     }
+    null = {
+      source  = "hashicorp/null"
+      version = "~> 3.0"
+    }
   }
   required_version = "~> 1.15.6"
 }
@@ -29,7 +33,6 @@ resource "libvirt_volume" "base" {
   }
 }
 
-
 module "tier" {
   source   = "./modules/tier"
   for_each = { for t in var.tiers : t.name => t }
@@ -46,4 +49,23 @@ module "tier" {
     ssh_public_key_path = var.ssh_keys.public_key_path
     base_volume_path    = libvirt_volume.base.path
   }
+}
+
+resource "null_resource" "known_hosts" {
+  for_each = merge([for tier_name, tier_mod in module.tier : tier_mod.domains]...)
+
+  triggers = {
+    ip = each.value
+  }
+
+  provisioner "local-exec" {
+    command = "ssh-keyscan -H ${each.value} >> ~/.ssh/known_hosts"
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = "ssh-keygen -R ${self.triggers.ip}"
+  }
+
+  depends_on = [module.tier]
 }
