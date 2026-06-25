@@ -1,6 +1,6 @@
 resource "libvirt_volume" "base" {
-  name = "${var.name}-base.qcow2"
-  pool = "default"
+  name = "${var.spec.name}-base.qcow2"
+  pool = var.spec.pool
 
   target = {
     format = {
@@ -10,17 +10,15 @@ resource "libvirt_volume" "base" {
 
   create = {
     content = {
-      # url = "https://cloud-images.ubuntu.com/noble/20260518/noble-server-cloudimg-amd64.img"
-      # url = "./iso/noble-server-cloudimg-amd64.img"
-      url = var.base_image_path
+      url = var.spec.base_image_path
     }
   }
 }
 
 resource "libvirt_volume" "root_disk" {
-  name          = "${var.name}-root.qcow2"
-  pool          = "default"
-  capacity      = var.capacity
+  name          = "${var.spec.name}-root.qcow2"
+  pool          = var.spec.pool
+  capacity      = var.spec.capacity
   capacity_unit = "GiB"
   target = {
     format = {

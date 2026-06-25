@@ -1,13 +1,9 @@
-variable "name" {
-  type = string
-}
-variable "base_image_path" {
-  description = "Path to the base image file (accepts url too)"
-  type        = string
-}
-
-variable "capacity" {
-  description = "The capacity of the root volume in gigabytes"
-  type        = number
-  default     = 40
+variable "spec" {
+  description = "Specification for the root volume"
+  type = object({
+    name            = string
+    pool            = string
+    base_image_path = string
+    capacity        = number
+  })
 }

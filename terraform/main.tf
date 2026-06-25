@@ -11,7 +11,11 @@ terraform {
 module "tier" {
   source = "./modules/tier"
 
-  name                = "mgmt"
-  ssh_public_key_path = "../keys/id_rsa.pub"
-  network_address     = "192.168.10.0/24"
+  spec = {
+    name                = "idx"
+    pool                = "default"
+    base_image_path     = "./iso/noble-server-cloudimg-amd64.img"
+    ssh_public_key_path = "../keys/id_rsa.pub"
+    network_address     = "192.168.10.0/24"
+  }
 }

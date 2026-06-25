@@ -1,26 +1,26 @@
 resource "libvirt_cloudinit_disk" "init" {
-  name = "${var.name}-disk"
+  name = "${var.spec.name}-disk"
   user_data = templatefile("${path.module}/user-data.tftpl", {
-    hostname       = var.name
-    ssh_public_key = trimspace(file(var.ssh_public_key_path))
+    hostname       = var.spec.name
+    ssh_public_key = trimspace(file(var.spec.ssh_public_key_path))
   })
 
   meta_data = templatefile("${path.module}/meta-data.tftpl", {
-    hostname    = var.name
-    instance_id = var.name
+    hostname    = var.spec.name
+    instance_id = var.spec.name
   })
 
   network_config = templatefile("${path.module}/network-config.tftpl", {
-    ip_address    = var.ip_address
-    prefix_length = var.prefix_length
-    gateway       = var.gateway
-    dns           = var.dns
+    ip_address    = var.spec.ip.address
+    prefix_length = var.spec.ip.prefix_length
+    gateway       = var.spec.ip.gateway
+    dns           = var.spec.ip.dns
   })
 }
 
 resource "libvirt_volume" "this" {
-  name = "${var.name}-init"
-  pool = "default"
+  name = "${var.spec.name}-init"
+  pool = var.spec.pool
   target = {
     format = {
       type = "iso"

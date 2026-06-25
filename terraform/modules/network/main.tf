@@ -1,7 +1,7 @@
 resource "libvirt_network" "this" {
-  name = "${var.name}-net"
+  name = "${var.spec.name}-net"
   ips = [{
-    address = cidrhost(var.cidr_address, 0)
-    netmask = cidrnetmask(var.cidr_address)
+    address = cidrhost(var.spec.cidr_address, 0)
+    netmask = cidrnetmask(var.spec.cidr_address)
   }]
 }

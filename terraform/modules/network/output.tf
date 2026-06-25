@@ -1,12 +1,13 @@
-output "id" {
-  value = libvirt_network.this.id
+output "name" {
+  value = "${var.spec.name}-net"
+
 }
 output "cidr_address" {
-  value = var.cidr_address
+  value = var.spec.cidr_address
 }
 output "gateway" {
-  value = cidrhost(var.cidr_address, 1)
+  value = cidrhost(var.spec.cidr_address, 1)
 }
 output "dns" {
-  value = cidrhost(var.cidr_address, 1)
+  value = cidrhost(var.spec.cidr_address, 1)
 }
