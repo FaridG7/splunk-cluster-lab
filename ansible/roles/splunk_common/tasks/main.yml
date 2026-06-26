@@ -1,0 +1,35 @@
+---
+# =============================================================================
+# splunk_common — tasks/main.yml
+# Orchestrates the sub-task files in the required order.
+# Each file owns one concern; none of them overlap.
+# =============================================================================
+
+- name: Assert required variables are defined
+  ansible.builtin.import_tasks: assert.yml
+  tags: [always, assert]
+
+- name: Manage splunk system user and group
+  ansible.builtin.import_tasks: user.yml
+  tags: [common, user]
+
+- name: Apply OS kernel tuning
+  ansible.builtin.import_tasks: kernel.yml
+  tags: [common, kernel]
+
+- name: Configure ulimits for splunk user
+  ansible.builtin.import_tasks: ulimits.yml
+  tags: [common, ulimits]
+
+- name: Disable Transparent Huge Pages
+  ansible.builtin.import_tasks: thp.yml
+  tags: [common, thp]
+  when: splunk_disable_thp | bool
+
+- name: Ensure NTP service is running
+  ansible.builtin.import_tasks: ntp.yml
+  tags: [common, ntp]
+
+- name: Create Splunk directory structure
+  ansible.builtin.import_tasks: directories.yml
+  tags: [common, directories]

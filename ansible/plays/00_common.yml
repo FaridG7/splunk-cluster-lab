@@ -1,0 +1,7 @@
+- name: Common baseline for all Splunk nodes
+  hosts: all
+  become: true
+  gather_facts: true
+
+  roles:
+    - role: splunk_common

@@ -1,0 +1,44 @@
+---
+# =============================================================================
+# Ensure NTP / time synchronisation is active.
+# Splunk indexer clustering has a hard dependency on clock synchronisation —
+# replication and search factor enforcement use timestamps internally.
+# Clock skew > 30s between nodes causes cluster instability.
+#
+# Ubuntu 24.04 cloud images ship systemd-timesyncd — no package to install,
+# just ensure the service is running and NTP is enabled in timedatectl.
+#
+# This task does not configure NTP servers — that is handled by the base
+# OS image (Ubuntu cloud images point at ntp.ubuntu.com by default).
+# =============================================================================
+
+- name: Ensure NTP service is enabled and running
+  ansible.builtin.systemd:
+    name: "{{ splunk_ntp_service }}"
+    enabled: true
+    state: started
+
+# timedatectl set-ntp true is idempotent — safe to always run.
+# Required because some cloud images boot with NTP disabled even though
+# systemd-timesyncd is installed (cloud-init may manage time instead).
+- name: Enable NTP via timedatectl
+  ansible.builtin.command:
+    cmd: timedatectl set-ntp true
+  changed_when: false         # timedatectl has no meaningful exit distinction
+
+- name: Verify time synchronisation status
+  ansible.builtin.command:
+    cmd: timedatectl show --property=NTPSynchronized --value
+  register: ntp_sync_status
+  changed_when: false
+  failed_when: false          # non-fatal — warn only, fresh VMs may not have
+                              # converged yet by the time Ansible runs
+
+- name: Warn if NTP is not yet synchronised
+  ansible.builtin.debug:
+    msg: >
+      WARNING: NTP not yet synchronised on {{ inventory_hostname }}.
+      This is normal on a freshly booted VM — timesyncd usually converges
+      within 30-60 seconds. Clock skew between cluster nodes will cause
+      replication issues; ensure sync before proceeding past play 02.
+  when: ntp_sync_status.stdout | trim != 'yes'

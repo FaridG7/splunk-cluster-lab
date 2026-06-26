@@ -1,0 +1,10 @@
+---
+# =============================================================================
+# splunk_common handlers
+# Splunk itself is not installed yet at this layer, so there is no
+# 'restart splunk' handler here. That lives in splunk_install and above.
+# =============================================================================
+
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: true

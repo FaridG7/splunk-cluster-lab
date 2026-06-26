@@ -1,0 +1,37 @@
+---
+# =============================================================================
+# Assert required variables before doing any real work.
+# Fail fast with a clear message rather than cryptic errors mid-play.
+# =============================================================================
+
+- name: Assert OS family is supported
+  ansible.builtin.assert:
+    that:
+      - ansible_os_family in ['RedHat', 'Debian']
+    fail_msg: >
+      Unsupported OS family '{{ ansible_os_family }}'.
+      splunk_common supports RedHat (RHEL/Rocky/AlmaLinux) and Debian (Ubuntu).
+    success_msg: "OS family '{{ ansible_os_family }}' is supported."
+
+- name: Assert splunk_user is defined and non-empty
+  ansible.builtin.assert:
+    that:
+      - splunk_user is defined
+      - splunk_user | length > 0
+    fail_msg: "splunk_user must be defined and non-empty."
+
+- name: Assert splunk_home is an absolute path
+  ansible.builtin.assert:
+    that:
+      - splunk_home is defined
+      - splunk_home.startswith('/')
+    fail_msg: "splunk_home must be an absolute path. Got: '{{ splunk_home | default('undefined') }}'"
+
+- name: Assert ulimit values are positive integers
+  ansible.builtin.assert:
+    that:
+      - splunk_ulimit_open_files | int > 0
+      - splunk_ulimit_max_procs  | int > 0
+    fail_msg: >
+      splunk_ulimit_open_files and splunk_ulimit_max_procs
+      must be positive integers.

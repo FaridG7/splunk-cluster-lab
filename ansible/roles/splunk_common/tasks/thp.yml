@@ -1,0 +1,52 @@
+---
+# =============================================================================
+# Disable Transparent Huge Pages (THP).
+# THP causes latency spikes and memory bloat in Splunk workloads.
+# Splunk's own pre-flight checks will warn if THP is enabled.
+#
+# Two steps are required:
+#   1. Disable at runtime (immediate effect, lost on reboot)
+#   2. Deploy a systemd unit to disable on every boot (persistent)
+# =============================================================================
+
+- name: Disable THP at runtime — enabled
+  ansible.builtin.shell:
+    cmd: echo never > /sys/kernel/mm/transparent_hugepage/enabled
+  changed_when: true       # shell tasks always report changed; acceptable here
+  # no 'when' guard — if the file doesn't exist the task simply fails,
+  # which is the right signal on unsupported kernels
+
+- name: Disable THP at runtime — defrag
+  ansible.builtin.shell:
+    cmd: echo never > /sys/kernel/mm/transparent_hugepage/defrag
+  changed_when: true
+
+- name: Deploy systemd unit to disable THP on boot
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/disable-thp.service
+    owner: root
+    group: root
+    mode: '0644'
+    content: |
+      [Unit]
+      Description=Disable Transparent Huge Pages for Splunk
+      DefaultDependencies=no
+      After=sysinit.target local-fs.target
+      Before=splunk.service
+
+      [Service]
+      Type=oneshot
+      ExecStart=/bin/sh -c 'echo never > /sys/kernel/mm/transparent_hugepage/enabled'
+      ExecStart=/bin/sh -c 'echo never > /sys/kernel/mm/transparent_hugepage/defrag'
+      RemainAfterExit=yes
+
+      [Install]
+      WantedBy=multi-user.target
+  notify: Reload systemd
+
+- name: Enable and start disable-thp service
+  ansible.builtin.systemd:
+    name: disable-thp
+    enabled: true
+    state: started
+    daemon_reload: true

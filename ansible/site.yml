@@ -1,0 +1,10 @@
+---
+- import_playbook: plays/00_common.yml
+# - import_playbook: plays/01_install.yml
+# - import_playbook: plays/02_cluster_manager.yml
+# - import_playbook: plays/03_indexers.yml
+# - import_playbook: plays/04_search_heads.yml
+# - import_playbook: plays/05_deployment_server.yml
+# - import_playbook: plays/06_license_manager.yml
+# - import_playbook: plays/07_forwarders.yml
+# - import_playbook: plays/08_monitoring_console.yml

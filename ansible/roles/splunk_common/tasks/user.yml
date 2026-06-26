@@ -1,0 +1,25 @@
+---
+# =============================================================================
+# Create the splunk system user and group.
+# Explicit UID/GID ensures consistency across all nodes — critical for
+# shared filesystem scenarios and avoids subtle permission drift.
+# =============================================================================
+
+- name: Create splunk group
+  ansible.builtin.group:
+    name: "{{ splunk_group }}"
+    gid: "{{ splunk_user_gid }}"
+    system: true
+    state: present
+
+- name: Create splunk user
+  ansible.builtin.user:
+    name: "{{ splunk_user }}"
+    uid: "{{ splunk_user_uid }}"
+    group: "{{ splunk_group }}"
+    comment: "Splunk service account"
+    shell: /sbin/nologin          # no interactive login — principle of least privilege
+    home: "{{ splunk_home }}"
+    create_home: false            # we create the dir ourselves in directories.yml
+    system: true
+    state: present
