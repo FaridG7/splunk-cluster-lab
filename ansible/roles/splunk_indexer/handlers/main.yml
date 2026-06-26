@@ -1,0 +1,9 @@
+---
+# =============================================================================
+# splunk_indexer handlers
+# =============================================================================
+
+- name: Restart splunk
+  ansible.builtin.systemd:
+    name: "{{ splunk_service_name }}"
+    state: restarted

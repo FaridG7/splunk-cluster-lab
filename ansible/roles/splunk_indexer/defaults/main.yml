@@ -1,0 +1,32 @@
+---
+# =============================================================================
+# splunk_indexer — defaults
+# Override in inventories/lab/group_vars/indexers.yml
+# =============================================================================
+
+# --- Cluster peer registration ------------------------------------------------
+# The CM URI each peer registers to. Uses the first host in the
+# cluster_manager group — resolved at runtime by Ansible.
+# Do not hardcode an IP here; the group reference is topology-agnostic.
+splunk_cm_uri: "https://{{ groups['cluster_manager'][0] }}:8089"
+
+# --- Shared cluster secret ----------------------------------------------------
+# Must match splunk_cluster_pass4symmkey set in the CM role exactly.
+# Both reference the same vault variable — defined once, used everywhere.
+splunk_cluster_pass4symmkey: ""
+
+# --- Replication port ---------------------------------------------------------
+# Port this peer opens to receive bucket copies from other peers.
+# Must match the [replication_port] stanza on the CM.
+splunk_replication_port: 9887
+
+# --- Receiving port -----------------------------------------------------------
+# Port this peer listens on for data from Universal Forwarders.
+# Forwarders send to this port; outputs.conf on UFs will reference it.
+splunk_receiving_port: 9997
+
+# --- Peer readiness polling ---------------------------------------------------
+# After registering, we poll the CM's peer list to confirm this peer appears
+# as "Up" before moving on to the next peer (serial: 1 in the play).
+splunk_peer_readiness_retries: 18
+splunk_peer_readiness_delay: 10   # 18 * 10 = 180s max per peer

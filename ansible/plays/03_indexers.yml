@@ -1,0 +1,20 @@
+---
+# =============================================================================
+# Play 03 — Indexer peers
+# Targets : indexers group (idx-0, idx-1, idx-2)
+# Purpose : Configure each indexer as a cluster peer and register it to the
+#           Cluster Manager. All three peers must be registered and the cluster
+#           must reach a valid state (RF and SF met) before play 04 (SH) runs.
+# Depends : play 02 (CM healthy and ready to accept peer registrations)
+# =============================================================================
+
+- name: Configure Splunk Indexer peers
+  hosts: indexers
+  become: true
+  gather_facts: false         # facts already collected in play 00
+  serial: 1                   # register peers one at a time — avoids a race
+                              # condition where all three peers restart
+                              # simultaneously and the CM sees a quorum loss
+
+  roles:
+    - role: splunk_indexer
