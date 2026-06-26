@@ -1,0 +1,44 @@
+---
+# =============================================================================
+# Extract the Splunk tarball into splunk_extract_target (/opt).
+#
+# The Splunk tarball's top-level directory is `splunk/`, so extracting into
+# /opt yields /opt/splunk — the splunk_home already created (and owned by
+# splunk:splunk) by splunk_common/tasks/directories.yml.
+#
+# Idempotency: the canonical "is Splunk installed?" marker is the splunk
+# CLI binary at SPLUNK_HOME/bin/splunk. We skip extraction entirely if it
+# exists, so re-running the play doesn't re-tar a live installation.
+#
+# Extraction runs AS the splunk user so every file is born with correct
+# ownership — no recursive chown after the fact.
+# =============================================================================
+
+- name: Check if Splunk binary already present (install marker)
+  ansible.builtin.stat:
+    path: "{{ splunk_home }}/bin/splunk"
+  register: splunk_binary
+
+- name: Extract Splunk tarball as the splunk user
+  ansible.builtin.unarchive:
+    src: "{{ splunk_archive_remote_path }}"
+    dest: "{{ splunk_extract_target }}"
+    remote_src: true
+    owner: "{{ splunk_user }}"
+    group: "{{ splunk_group }}"
+    extra_opts: "--no-same-owner"
+  become: true
+  become_user: root
+  when: not splunk_binary.stat.exists
+
+# `unarchive ... owner:` sets the owner for newly-created entries but does
+# not recursively chown the pre-existing splunk_home dir (already correct).
+# Confirm the tree is fully owned by splunk before first run — cheap and
+# catches the rare case where a partial prior run left stray root files.
+- name: Ensure SPLUNK_HOME tree is owned by splunk
+  ansible.builtin.file:
+    path: "{{ splunk_home }}"
+    owner: "{{ splunk_user }}"
+    group: "{{ splunk_group }}"
+    recurse: true
+  when: not splunk_binary.stat.exists

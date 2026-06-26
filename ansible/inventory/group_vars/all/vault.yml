@@ -1,0 +1,15 @@
+---
+# =============================================================================
+# group_vars/all/vault.yml — secrets.
+#
+# THIS FILE MUST BE ENCRYPTED WITH ANSIBLE-VAULT before it leaves your laptop:
+#
+#     ansible-vault encrypt ansible/inventory/group_vars/all/vault.yml
+#
+# The placeholder value below is only here so the file is non-empty and the
+# intent is obvious. Replace it with the real cluster admin password, then
+# encrypt the file. splunk_install/tasks/assert.yml enforces a >=8 char
+# minimum, so an unmodified placeholder will fail the play loudly.
+# =============================================================================
+
+splunk_admin_password: "CHANGE_ME_before_vault_encrypt"

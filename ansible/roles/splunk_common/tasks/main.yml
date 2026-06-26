@@ -9,6 +9,10 @@
   ansible.builtin.import_tasks: assert.yml
   tags: [always, assert]
 
+- name: Install required OS packages
+  ansible.builtin.import_tasks: packages.yml
+  tags: [common, packages]
+
 - name: Manage splunk system user and group
   ansible.builtin.import_tasks: user.yml
   tags: [common, user]

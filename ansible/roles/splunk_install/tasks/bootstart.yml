@@ -1,0 +1,51 @@
+---
+# =============================================================================
+# Install the systemd unit via `splunk enable boot-start`.
+#
+# `enable boot-start` generates /etc/systemd/system/Splunkd.service pointing
+# at SPLUNK_HOME/bin/splunk start, and enables it for multi-user.target.
+# Doing this via the Splunk CLI (rather than hand-rolling a unit) means we
+# track whatever invocation convention the installed Splunk version uses.
+#
+# We also pass -user "{{ splunk_user }}" so the generated unit runs Splunk
+# as the right account rather than the user invoking the command.
+# =============================================================================
+
+- name: Check if boot-start systemd unit already exists
+  ansible.builtin.stat:
+    path: "/etc/systemd/system/{{ splunk_service_name }}.service"
+  register: splunk_unit
+
+- name: Enable Splunk boot-start (systemd)
+  ansible.builtin.command:
+    cmd: >-
+      {{ splunk_home }}/bin/splunk enable boot-start
+      -user {{ splunk_user }}
+      --accept-license --answer-yes
+  become: true
+  environment:
+    SPLUNK_HOME: "{{ splunk_home }}"
+  register: bootstart_result
+  changed_when: "'Successful' in bootstart_result.stdout"
+  when:
+    - splunk_enable_boot_start | bool
+    - not splunk_unit.stat.exists
+
+- name: Reload systemd to pick up the new unit
+  ansible.builtin.systemd:
+    daemon_reload: true
+  when:
+    - splunk_enable_boot_start | bool
+    - not splunk_unit.stat.exists
+
+- name: Ensure Splunk service is enabled
+  ansible.builtin.systemd:
+    name: "{{ splunk_service_name }}"
+    enabled: true
+  when: splunk_enable_boot_start | bool
+
+- name: Clean up staged tarball
+  ansible.builtin.file:
+    path: "{{ splunk_archive_remote_path }}"
+    state: absent
+  when: splunk_archive_remote_path is defined

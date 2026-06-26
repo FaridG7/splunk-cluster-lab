@@ -1,0 +1,10 @@
+---
+galaxy_info:
+  role_name: splunk_install
+  description: Install Splunk Enterprise from tarball and bootstrap first run
+  min_ansible_version: "2.14"
+
+# splunk_common is intentionally NOT declared as a dependency: 00_common.yml
+# already runs as its own play before 01_install.yml. Declaring it here would
+# re-run the common role on every install play. Rely on play ordering instead.
+dependencies: []

@@ -1,0 +1,38 @@
+---
+# =============================================================================
+# group_vars/all — applies to every Splunk node.
+# Variables here override role defaults; host_vars / tier group_vars override
+# these. Keep only cluster-wide values here.
+# =============================================================================
+
+# --- Splunk user & group -------------------------------------------------------
+splunk_user: splunk
+splunk_group: splunk
+splunk_user_uid: 1500
+splunk_user_gid: 1500
+
+# --- Directory layout ---------------------------------------------------------
+splunk_home: /opt/splunk
+splunk_var_dir: /opt/splunk/var
+splunk_db_dir: /opt/splunk/var/lib/splunk
+
+# --- ulimit targets (Splunk recommendations) ----------------------------------
+splunk_ulimit_open_files: 65535
+splunk_ulimit_max_procs: 16000
+
+# --- Kernel / OS tuning -------------------------------------------------------
+splunk_vm_max_map_count: 262144        # required for Splunk's memory-mapped files
+splunk_vm_swappiness: 10               # reduce swap aggressiveness
+splunk_net_core_somaxconn: 1024        # listen backlog for high-ingest nodes
+splunk_disable_thp: true               # Transparent Huge Pages harm Splunk perf
+
+# --- NTP / time ---------------------------------------------------------------
+#   Ubuntu 22.04 / 24.04  → systemd-timesyncd
+#   RHEL / Rocky 8 & 9    → chronyd
+splunk_ntp_service: systemd-timesyncd
+
+# --- Splunk install source ----------------------------------------------------
+splunk_archive_local_path: "~/Downloads/splunk-10.4.0-f798d4d49089-linux-amd64.tgz"
+
+# Re-staged on each node to /tmp/splunk.tgz (matches the role default).
+# splunk_archive_remote_path: /tmp/splunk.tgz

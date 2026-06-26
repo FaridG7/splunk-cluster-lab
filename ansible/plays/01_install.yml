@@ -1,0 +1,7 @@
+- name: Install Splunk Enterprise on all Splunk nodes
+  hosts: all
+  become: true
+  gather_facts: true
+
+  roles:
+    - role: splunk_install

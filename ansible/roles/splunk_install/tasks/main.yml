@@ -1,0 +1,29 @@
+---
+# =============================================================================
+# splunk_install — tasks/main.yml
+# Orchestrates the sub-task files in the required order.
+# Each file owns one concern; none of them overlap.
+#
+# Pre-condition: splunk_common (play 00) has already created the splunk user,
+# tuned the OS, and created the SPLUNK_HOME / var / db directory tree.
+# =============================================================================
+
+- name: Assert required variables are defined
+  ansible.builtin.import_tasks: assert.yml
+  tags: [always, assert]
+
+- name: Stage the Splunk tarball on the target host
+  ansible.builtin.import_tasks: fetch.yml
+  tags: [install, fetch]
+
+- name: Extract the tarball into SPLUNK_HOME
+  ansible.builtin.import_tasks: extract.yml
+  tags: [install, extract]
+
+- name: Bootstrap Splunk first run and admin password
+  ansible.builtin.import_tasks: bootstrap.yml
+  tags: [install, bootstrap]
+
+- name: Install systemd boot-start unit
+  ansible.builtin.import_tasks: bootstart.yml
+  tags: [install, bootstart]

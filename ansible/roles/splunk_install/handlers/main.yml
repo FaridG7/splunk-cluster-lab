@@ -1,0 +1,11 @@
+---
+# =============================================================================
+# splunk_install handlers
+# Splunk is installed and managed by systemd at this layer, so the restart
+# handler lives here. Plays 02+ notify it after dropping config files.
+# =============================================================================
+
+- name: Restart splunk
+  ansible.builtin.systemd:
+    name: "{{ splunk_service_name }}"
+    state: restarted

@@ -1,0 +1,41 @@
+---
+# =============================================================================
+# Stage the Splunk tarball onto the target host.
+#
+# The Splunk binary itself is the same across all tiers (Enterprise tarball),
+# so this task is uniform. The archive is staged to splunk_archive_remote_path
+# (/tmp/splunk.tgz by default) so the extract step has a known source.
+#
+# Two mutually exclusive sources, enforced by assert.yml:
+#   - splunk_archive_url        → download from controller to target via get_url
+#   - splunk_archive_local_path → push a controller-local file via copy
+# =============================================================================
+
+- name: Stage tarball from remote URL
+  ansible.builtin.get_url:
+    url: "{{ splunk_archive_url }}"
+    dest: "{{ splunk_archive_remote_path }}"
+    mode: '0644'
+    force: false
+  when: splunk_archive_url | length > 0
+
+- name: Stage tarball from controller-local file
+  ansible.builtin.copy:
+    src: "{{ splunk_archive_local_path }}"
+    dest: "{{ splunk_archive_remote_path }}"
+    mode: '0644'
+    force: false
+  when: splunk_archive_local_path | length > 0
+
+- name: Stat staged tarball
+  ansible.builtin.stat:
+    path: "{{ splunk_archive_remote_path }}"
+  register: staged_archive
+
+- name: Fail if staged tarball is missing
+  ansible.builtin.assert:
+    that:
+      - staged_archive.stat.exists
+    fail_msg: >
+      Splunk archive was not staged at {{ splunk_archive_remote_path }}.
+      Check splunk_archive_url / splunk_archive_local_path and connectivity.

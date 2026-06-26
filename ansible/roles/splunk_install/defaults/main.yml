@@ -1,0 +1,41 @@
+---
+# =============================================================================
+# splunk_install — defaults
+# Lowest-priority vars. Override in group_vars/all or per-tier group_vars.
+# =============================================================================
+
+# --- Splunk package source ----------------------------------------------------
+# Provide EXACTLY ONE of the two sources below. assert.yml enforces this.
+#
+#   splunk_archive_url         — pull the tarball from a remote HTTP(S) location
+#   splunk_archive_local_path  — copy a tarball already on the Ansible controller
+#
+# A home lab usually keeps the downloaded tarball on the controller and pushes
+# it out; that avoids every node hammering splunk.com.
+splunk_archive_url: ""
+splunk_archive_local_path: ""
+
+# Where the staged tarball lives on the target host before extraction.
+splunk_archive_remote_path: /tmp/splunk.tgz
+
+# Extraction target. The Splunk tarball top-level dir is `splunk/`, so
+# extracting into /opt yields /opt/splunk — matching splunk_home from common.
+splunk_extract_target: /opt
+
+# --- Bootstrap / first run ----------------------------------------------------
+# Splunk cannot be installed unattended without accepting the license.
+splunk_accept_license: true
+
+# Admin seed credentials. The password MUST be provided via vault; the empty
+# default makes a missing vault fail loudly in assert.yml instead of silently
+# seeding a blank password.
+splunk_admin_username: admin
+splunk_admin_password: ""
+
+# Install the systemd unit so Splunk starts on boot.
+splunk_enable_boot_start: true
+
+# --- Service ------------------------------------------------------------------
+# `splunk enable boot-start` creates a unit named Splunkd.service (Enterprise).
+# Later plays notify this handler name to restart Splunk after config changes.
+splunk_service_name: splunk

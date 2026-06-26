@@ -1,0 +1,38 @@
+---
+# =============================================================================
+# Assert required variables before doing any real work.
+# Fail fast with a clear message rather than cryptic errors mid-install.
+# =============================================================================
+
+- name: Assert exactly one Splunk archive source is configured
+  ansible.builtin.assert:
+    that:
+      - (splunk_archive_url | length > 0) != (splunk_archive_local_path | length > 0)
+    fail_msg: >
+      Configure exactly ONE of splunk_archive_url or splunk_archive_local_path.
+      Leaving both empty means there is nothing to install; setting both is
+      ambiguous.
+    success_msg: "Splunk archive source is configured."
+
+- name: Assert license acceptance is enabled
+  ansible.builtin.assert:
+    that:
+      - splunk_accept_license | bool
+    fail_msg: >
+      Splunk cannot be installed unattended without accepting the license.
+      Set splunk_accept_license: true to proceed.
+
+- name: Assert admin password is defined and meets minimum length
+  ansible.builtin.assert:
+    that:
+      - splunk_admin_password is defined
+      - splunk_admin_password | length >= 8
+    fail_msg: >
+      splunk_admin_password must be set (use the vault) and be at least 8
+      characters. Provide it via inventory/group_vars/all/vault.yml.
+
+- name: Assert extract target is an absolute path
+  ansible.builtin.assert:
+    that:
+      - splunk_extract_target.startswith('/')
+    fail_msg: "splunk_extract_target must be an absolute path. Got: '{{ splunk_extract_target }}'"
