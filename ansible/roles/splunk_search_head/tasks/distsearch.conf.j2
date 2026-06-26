@@ -1,0 +1,15 @@
+{# =========================================================================== #}
+{# distsearch.conf.j2 — splunk_search_head                                   #}
+{#                                                                            #}
+{# Enables cluster-aware distributed search mode.                            #}
+{#                                                                            #}
+{# IMPORTANT: Do NOT add [distributedSearch] servers = ... lines here.       #}
+{# That is the old non-cluster pattern. In cluster-aware mode the SH gets    #}
+{# its peer list from the CM via the [clustering] stanza in server.conf.     #}
+{# Mixing both patterns causes duplicate search and split-brain search jobs. #}
+{# =========================================================================== #}
+
+[distributedSearch]
+disabled = false
+autoAddServers = false          # CM manages the peer list; we don't auto-discover
+checkTimedOutServersFrequency = 60

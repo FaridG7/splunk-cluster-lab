@@ -1,0 +1,30 @@
+---
+# =============================================================================
+# splunk_search_head — defaults
+# Override in inventories/lab/group_vars/search_heads.yml
+# =============================================================================
+
+# --- Cluster connection -------------------------------------------------------
+# CM URI the SH registers to. Derived from the cluster_manager inventory
+# group at runtime — same pattern as splunk_indexer for consistency.
+splunk_cm_uri: "https://{{ groups['cluster_manager'][0] }}:8089"
+
+# --- Shared cluster secret ----------------------------------------------------
+# Must be identical across CM, all peers, and all search heads.
+# Sourced from vault — never hardcode here.
+splunk_cluster_pass4symmkey: ""
+
+# --- Distributed search -------------------------------------------------------
+# The SH discovers its search peers via the CM (cluster-aware distributed
+# search). No need to list indexer IPs manually — the CM provides the list.
+# This port is what the SH uses to dispatch searches to each indexer peer.
+splunk_search_port: 8089
+
+# --- SH web interface ---------------------------------------------------------
+splunk_web_port: 8000
+splunk_enable_tls: false          # matches lab-wide setting from play 00
+
+# --- SH readiness polling -----------------------------------------------------
+# After restart, poll the SH's own /info endpoint until it's serving searches.
+splunk_sh_readiness_retries: 18
+splunk_sh_readiness_delay: 10     # 18 * 10 = 180s max

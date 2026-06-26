@@ -1,0 +1,18 @@
+---
+# =============================================================================
+# Play 04 — Search Head
+# Targets : search_heads group (sh-0 in lab)
+# Purpose : Configure sh-0 as a cluster search head, connect it to the CM,
+#           and configure distributed search across all indexed peers.
+# Depends : play 03 complete — all three peers must be Up in the CM before
+#           the SH connects, otherwise the SH gets an incomplete peer list
+#           and distributed search will miss buckets on unregistered peers.
+# =============================================================================
+
+- name: Configure Splunk Search Head
+  hosts: search_heads
+  become: true
+  gather_facts: false         # facts already collected in play 00
+
+  roles:
+    - role: splunk_search_head

@@ -1,0 +1,66 @@
+---
+# =============================================================================
+# Wait for the Search Head to be ready to serve searches.
+#
+# After restart the SH must:
+#   - re-open port 8089
+#   - re-connect to the CM and pull the current peer list
+#   - initialise the distributed search subsystem
+#
+# We poll /services/search/distributed/peers on the SH itself — when this
+# endpoint returns peers that match our indexer inventory, the SH is ready.
+#
+# A secondary check polls /services/cluster/searchhead/info to confirm
+# the SH sees itself as connected to the CM (status = connected).
+# =============================================================================
+
+- name: Wait for SH management port to open after restart
+  ansible.builtin.wait_for:
+    host: "{{ ansible_host }}"
+    port: 8089
+    timeout: 120
+    state: started
+
+- name: Poll SH cluster status until connected to CM
+  ansible.builtin.uri:
+    url: "https://{{ ansible_host }}:8089/services/cluster/searchhead/\
+          info?output_mode=json"
+    method: GET
+    user: "{{ splunk_admin_username }}"
+    password: "{{ splunk_admin_password }}"
+    validate_certs: false
+    status_code: 200
+    return_content: true
+  register: sh_cluster_info
+  until: >
+    sh_cluster_info.status == 200 and
+    sh_cluster_info.json.entry[0].content.status is defined and
+    sh_cluster_info.json.entry[0].content.status == 'Connected'
+  retries: "{{ splunk_sh_readiness_retries }}"
+  delay: "{{ splunk_sh_readiness_delay }}"
+  failed_when: sh_cluster_info.status not in [200, -1]
+
+- name: Poll SH distributed peers until all indexers are visible
+  ansible.builtin.uri:
+    url: "https://{{ ansible_host }}:8089/services/search/distributed/\
+          peers?output_mode=json"
+    method: GET
+    user: "{{ splunk_admin_username }}"
+    password: "{{ splunk_admin_password }}"
+    validate_certs: false
+    status_code: 200
+    return_content: true
+  register: sh_peers
+  until: >
+    sh_peers.status == 200 and
+    sh_peers.json.entry | length >= groups['indexers'] | length
+  retries: "{{ splunk_sh_readiness_retries }}"
+  delay: "{{ splunk_sh_readiness_delay }}"
+  failed_when: sh_peers.status not in [200, -1]
+
+- name: Report search head status
+  ansible.builtin.debug:
+    msg: >
+      Search Head {{ inventory_hostname }} is ready.
+      CM status    : {{ sh_cluster_info.json.entry[0].content.status }}
+      Visible peers: {{ sh_peers.json.entry | map(attribute='name') | list | join(', ') }}

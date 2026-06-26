@@ -1,0 +1,12 @@
+{# =========================================================================== #}
+{# server.conf.j2 — splunk_search_head                                       #}
+{#                                                                            #}
+{# Owns ONLY: [clustering] searchhead stanza                                 #}
+{# Peer discovery is cluster-aware — CM provides the list dynamically.       #}
+{# No need to list indexer IPs here.                                         #}
+{# =========================================================================== #}
+
+[clustering]
+mode = searchhead
+master_uri = {{ splunk_cm_uri }}
+pass4SymmKey = {{ splunk_cluster_pass4symmkey }}
