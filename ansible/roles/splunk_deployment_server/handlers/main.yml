@@ -1,0 +1,22 @@
+---
+# =============================================================================
+# splunk_deployment_server handlers
+#
+# reload_deploy_server is preferred over a full Splunk restart when only
+# serverclass.conf or deployment-apps content changes — it reloads the DS
+# subsystem without interrupting the CM or LM roles running on the same
+# mgmt-0 process. A full restart is reserved for server.conf changes.
+# =============================================================================
+
+- name: Restart splunk
+  ansible.builtin.systemd:
+    name: "{{ splunk_service_name }}"
+    state: restarted
+
+- name: Reload deployment server
+  ansible.builtin.command:
+    cmd: >-
+      {{ splunk_home }}/bin/splunk reload deploy-server
+      -auth {{ splunk_admin_username }}:{{ splunk_admin_password }}
+  become_user: "{{ splunk_user }}"
+  changed_when: true

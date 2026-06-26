@@ -1,0 +1,15 @@
+{# =========================================================================== #}
+{# serverclass.conf.j2 — splunk_deployment_server                            #}
+{#                                                                            #}
+{# Maps the outputs app to the universal_forwarders server class.            #}
+{# Any forwarder that phones home to the DS is matched by the wildcard       #}
+{# and receives the org_all_indexers_output app automatically.               #}
+{# =========================================================================== #}
+
+[serverClass:{{ splunk_uf_serverclass }}]
+whitelist.0 = *
+
+[serverClass:{{ splunk_uf_serverclass }}:app:{{ splunk_outputs_app_name }}]
+restartSplunkWeb = false
+restartSplunkd = true
+stateOnClient = enabled

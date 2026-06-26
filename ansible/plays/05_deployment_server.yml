@@ -1,0 +1,22 @@
+---
+# =============================================================================
+# Play 05 — Deployment Server
+# Targets : deployment_server group (mgmt-0 in lab — visit 2 of 4)
+# Purpose : Configure the DS role on mgmt-0. Creates the deployment-apps
+#           directory structure, writes serverclass.conf to assign forwarder
+#           classes, and drops a base outputs.conf app that forwarders will
+#           receive to point their data at the indexer tier.
+# Depends : play 04 complete — the SH must be up so the DS can use the
+#           full cluster topology when building forwarder output targets.
+#           The DS itself does not depend on the SH functionally, but play
+#           ordering ensures the whole cluster is healthy before we start
+#           pushing configs to forwarders.
+# =============================================================================
+
+- name: Configure Splunk Deployment Server
+  hosts: deployment_server
+  become: true
+  gather_facts: false         # facts already collected in play 00
+
+  roles:
+    - role: splunk_deployment_server

@@ -1,0 +1,23 @@
+{# =========================================================================== #}
+{# outputs.conf.j2 — org_all_indexers_output app                             #}
+{#                                                                            #}
+{# Pushed by the DS to every Universal Forwarder in the                      #}
+{# universal_forwarders server class.                                        #}
+{#                                                                            #}
+{# The indexer target list is built dynamically from the [indexers]          #}
+{# inventory group — adding an indexer to the inventory automatically        #}
+{# includes it here on the next DS play run.                                 #}
+{#                                                                            #}
+{# autoLBFrequency = 30: forwarders rotate between indexers every 30s        #}
+{# rather than per-event, which reduces connection overhead on busy streams. #}
+{# =========================================================================== #}
+
+[tcpout]
+defaultGroup = primary_indexers
+disabled = false
+
+[tcpout:primary_indexers]
+server = {% for host in groups['indexers'] %}{{ hostvars[host]['ansible_host'] }}:{{ splunk_receiving_port }}{% if not loop.last %},{% endif %}{% endfor %}
+
+autoLBFrequency = 30
+compressed = true

@@ -1,0 +1,36 @@
+---
+# =============================================================================
+# Assert DS-specific required variables.
+# =============================================================================
+
+- name: Assert indexers group is not empty
+  ansible.builtin.assert:
+    that:
+      - groups['indexers'] | length > 0
+    fail_msg: >
+      The [indexers] inventory group is empty.
+      The DS outputs app is built dynamically from this group — it needs
+      at least one indexer to generate a valid outputs.conf for forwarders.
+
+- name: Assert DS port is valid
+  ansible.builtin.assert:
+    that:
+      - splunk_ds_port | int > 1024
+      - splunk_ds_port | int < 65535
+    fail_msg: "splunk_ds_port must be between 1024 and 65535. Got: {{ splunk_ds_port }}"
+
+- name: Assert receiving port matches indexer role
+  ansible.builtin.assert:
+    that:
+      - splunk_receiving_port | int > 1024
+      - splunk_receiving_port | int < 65535
+    fail_msg: >
+      splunk_receiving_port must be a valid port. Got: {{ splunk_receiving_port }}.
+      This must match splunk_receiving_port in splunk_indexer/defaults/main.yml.
+
+- name: Assert outputs app name is defined
+  ansible.builtin.assert:
+    that:
+      - splunk_outputs_app_name is defined
+      - splunk_outputs_app_name | length > 0
+    fail_msg: "splunk_outputs_app_name must be a non-empty string."
