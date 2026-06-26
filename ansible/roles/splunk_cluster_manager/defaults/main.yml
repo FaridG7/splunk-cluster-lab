@@ -1,0 +1,32 @@
+---
+# =============================================================================
+# splunk_cluster_manager — defaults
+# Override in inventories/lab/group_vars/cluster_manager.yml
+# =============================================================================
+
+# --- Cluster identity ---------------------------------------------------------
+# The cluster label appears in the Monitoring Console and Splunk Web UI.
+splunk_cluster_label: splunk-lab-cluster
+
+# --- Replication and search factors -------------------------------------------
+# Replication factor: how many copies of each bucket are maintained.
+# Minimum 3 indexers needed for RF=3 (you have exactly 3 — don't raise this).
+splunk_replication_factor: 3
+
+# Search factor: how many copies are in a searchable (uncompressed) state.
+# SF must always be <= RF. 2 means 2 peers can serve searches at any time.
+splunk_search_factor: 2
+
+# --- Cluster communication ports ----------------------------------------------
+# Port the CM listens on for management API calls from peers and search heads.
+splunk_replication_port: 9887
+
+# --- Shared cluster secret ----------------------------------------------------
+# pass4SymmKey authenticates all cluster communication.
+# MUST be overridden in vault.yml — empty default causes assert to fail loudly.
+splunk_cluster_pass4symmkey: ""
+
+# --- CM readiness polling -----------------------------------------------------
+# How long to wait for the CM to become healthy after restart before giving up.
+splunk_cm_readiness_retries: 20
+splunk_cm_readiness_delay: 10    # seconds between retries (20 * 10 = 200s max)

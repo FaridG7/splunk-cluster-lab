@@ -1,0 +1,11 @@
+---
+# =============================================================================
+# splunk_cluster_manager handlers
+# After a CM restart we must poll for readiness before downstream plays
+# attempt peer registration. flush_handlers + wait.yml handles this.
+# =============================================================================
+
+- name: Restart splunk
+  ansible.builtin.systemd:
+    name: "{{ splunk_service_name }}"
+    state: restarted

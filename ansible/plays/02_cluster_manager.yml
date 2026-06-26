@@ -1,0 +1,17 @@
+---
+# =============================================================================
+# Play 02 — Cluster Manager
+# Targets : cluster_manager group (mgmt-0 in lab)
+# Purpose : Configure the CM role on mgmt-0. Must complete and the CM must
+#           be healthy before play 03 (indexers) runs — indexer peers cannot
+#           register to a CM that hasn't been configured yet.
+# Depends : play 00 (OS tuning), play 01 (Splunk installed and running)
+# =============================================================================
+
+- name: Configure Splunk Cluster Manager
+  hosts: cluster_manager
+  become: true
+  gather_facts: false         # facts already collected in play 00
+
+  roles:
+    - role: splunk_cluster_manager

@@ -1,0 +1,39 @@
+---
+# =============================================================================
+# Assert CM-specific required variables.
+# The cluster secret is the most critical — an empty pass4SymmKey means
+# all cluster communication silently fails with auth errors.
+# =============================================================================
+
+- name: Assert splunk_cluster_pass4symmkey is set
+  ansible.builtin.assert:
+    that:
+      - splunk_cluster_pass4symmkey is defined
+      - splunk_cluster_pass4symmkey | length >= 16
+    fail_msg: >
+      splunk_cluster_pass4symmkey must be set and at least 16 characters.
+      Store it in inventories/lab/group_vars/all/vault.yml (ansible-vault).
+      All cluster nodes must share the same value or peer registration fails.
+
+- name: Assert replication factor is 3 or more
+  ansible.builtin.assert:
+    that:
+      - splunk_replication_factor | int >= 3
+    fail_msg: >
+      splunk_replication_factor must be >= 3 for a viable cluster.
+      You have 3 indexers — set it to exactly 3.
+
+- name: Assert search factor does not exceed replication factor
+  ansible.builtin.assert:
+    that:
+      - splunk_search_factor | int <= splunk_replication_factor | int
+    fail_msg: >
+      splunk_search_factor ({{ splunk_search_factor }}) cannot exceed
+      splunk_replication_factor ({{ splunk_replication_factor }}).
+
+- name: Assert cluster label is defined
+  ansible.builtin.assert:
+    that:
+      - splunk_cluster_label is defined
+      - splunk_cluster_label | length > 0
+    fail_msg: "splunk_cluster_label must be a non-empty string."

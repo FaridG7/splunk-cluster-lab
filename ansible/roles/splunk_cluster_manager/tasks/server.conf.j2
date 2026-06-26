@@ -1,0 +1,16 @@
+{# =========================================================================== #}
+{# server.conf.j2 — splunk_cluster_manager                                   #}
+{#                                                                            #}
+{# Owns ONLY: [clustering] and [replication_port]                            #}
+{# All other stanzas belong to their respective roles.                       #}
+{# Splunk merges this with configs from other role app dirs at runtime.      #}
+{# =========================================================================== #}
+
+[clustering]
+mode = manager
+replication_factor = {{ splunk_replication_factor }}
+search_factor = {{ splunk_search_factor }}
+pass4SymmKey = {{ splunk_cluster_pass4symmkey }}
+cluster_label = {{ splunk_cluster_label }}
+
+[replication_port://{{ splunk_replication_port }}]

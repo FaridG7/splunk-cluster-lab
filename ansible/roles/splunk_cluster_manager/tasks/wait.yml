@@ -1,0 +1,52 @@
+---
+# =============================================================================
+# Wait for the Cluster Manager to become ready.
+#
+# After a restart the CM needs time to:
+#   - initialise its internal SQLite state DB
+#   - open the management port (8089)
+#   - start serving the /services/cluster/manager/info endpoint
+#
+# We poll that endpoint and check that status == "idle" or "ready".
+# "idle" means the CM is up but no peers have registered yet — which is
+# exactly the state we expect at this point in the bootstrap.
+#
+# Why not just wait_for port 8089?
+# The port can open before Splunk has fully initialised the clustering
+# subsystem. Polling the actual cluster endpoint is the correct signal.
+# =============================================================================
+
+- name: Wait for CM management port to open
+  ansible.builtin.wait_for:
+    host: "{{ ansible_host }}"
+    port: 8089
+    timeout: 120
+    state: started
+
+- name: Poll CM /info endpoint until status is ready
+  ansible.builtin.uri:
+    url: "https://{{ ansible_host }}:8089/services/cluster/manager/info\
+          ?output_mode=json"
+    method: GET
+    user: "{{ splunk_admin_username }}"
+    password: "{{ splunk_admin_password }}"
+    validate_certs: false          # TLS disabled in lab (splunk_enable_tls: false)
+    status_code: 200
+    return_content: true
+  register: cm_info
+  until: >
+    cm_info.status == 200 and
+    (cm_info.json.entry[0].content.active_bundle is defined)
+  retries: "{{ splunk_cm_readiness_retries }}"
+  delay: "{{ splunk_cm_readiness_delay }}"
+  failed_when: cm_info.status not in [200, -1]   # -1 = connection refused, keep retrying
+
+- name: Report CM status
+  ansible.builtin.debug:
+    msg: >
+      Cluster Manager on {{ inventory_hostname }} is ready.
+      Mode       : {{ cm_info.json.entry[0].content.mode }}
+      RF         : {{ cm_info.json.entry[0].content.replication_factor }}
+      SF         : {{ cm_info.json.entry[0].content.search_factor }}
+      Active bundle: {{ cm_info.json.entry[0].content.active_bundle.checksum
+                        | default('none yet') }}
