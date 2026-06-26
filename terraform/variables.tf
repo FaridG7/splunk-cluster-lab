@@ -25,5 +25,5 @@ variable "ssh_keys" {
 variable "ansible_inventory_path" {
   description = "Path where the Ansible inventory file will be written"
   type        = string
-  default     = "../ansible/inventory.ini"
+  default     = "../ansible/inventory/hosts.ini"
 }
