@@ -32,6 +32,10 @@ resource "libvirt_domain" "this" {
   type        = "kvm"
   running     = true
 
+  cpu = {
+    mode = "host-model"
+  }
+
   os = {
     type = "hvm"
   }
