@@ -1,20 +1,44 @@
 ssh_keys = {
-    public_key_path = "../keys/id_rsa.pub"
-    private_key_path = "../keys/id_rsa"
-  }
-tiers = [{
-  name            = "mgmt"
-  network_address = "192.168.10.0/24"
-  domain_count    = 1
-  memory          = 2048
-  vcpu            = 2
-  capacity        = 20
-  }, {
-  name            = "idx"
-  network_address = "192.168.20.0/24"
-  domain_count    = 3
-  }, {
-  name            = "sh"
-  network_address = "192.168.30.0/24"
-  domain_count    = 1
-}]
+  public_key_path  = "../keys/id_rsa.pub"
+  private_key_path = "../keys/id_rsa"
+}
+
+tiers = [
+  {
+    name            = "mgmt"
+    network_address = "192.168.10.0/24"
+    domain_count    = 1
+    memory          = 2048
+    vcpu            = 2
+    capacity        = 20
+    firewall_rules = [
+      # Cluster master -> indexer peers: REST API + replication
+      { dst = "idx", port = 8089, proto = "tcp" },
+      { dst = "idx", port = 9887, proto = "tcp" },
+      # Deployer -> search head: REST API
+      { dst = "sh", port = 8089, proto = "tcp" },
+    ]
+  },
+  {
+    name            = "idx"
+    network_address = "192.168.20.0/24"
+    domain_count    = 3
+    firewall_rules = [
+      # Indexer peers -> cluster master: REST API + replication reporting
+      { dst = "mgmt", port = 8089, proto = "tcp" },
+      { dst = "mgmt", port = 9887, proto = "tcp" },
+    ]
+  },
+  {
+    name            = "sh"
+    network_address = "192.168.30.0/24"
+    domain_count    = 1
+    firewall_rules = [
+      # Search head -> indexers: search dispatch + summary indexing
+      { dst = "idx", port = 8089, proto = "tcp" },
+      { dst = "idx", port = 9997, proto = "tcp" },
+      # Search head -> cluster master: REST API
+      { dst = "mgmt", port = 8089, proto = "tcp" },
+    ]
+  },
+]

@@ -1,7 +1,7 @@
 resource "libvirt_network" "this" {
   name = "${var.spec.name}-net"
   forward = {
-    mode = "nat"
+    mode = "open"
   }
   ips = [{
     address = cidrhost(var.spec.cidr_address, 1)
