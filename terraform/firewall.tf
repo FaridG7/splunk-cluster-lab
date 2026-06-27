@@ -95,3 +95,44 @@ resource "null_resource" "fw_rules" {
 
   depends_on = [null_resource.fw_chain]
 }
+resource "null_resource" "nat_rules" {
+  for_each = {
+    for t in var.tiers : t.name => t.network_address
+  }
+
+  triggers = {
+    cidr = each.value
+  }
+
+  provisioner "local-exec" {
+    interpreter = ["sudo", "bash", "-c"]
+
+    command = <<-EOT
+      IFACE=$(ip route show default | awk '/default/ {print $5}')
+
+      iptables -t nat -C POSTROUTING \
+        -s ${self.triggers.cidr} \
+        -o "$IFACE" \
+        -j MASQUERADE >/dev/null 2>&1 \
+      || iptables -t nat -A POSTROUTING \
+        -s ${self.triggers.cidr} \
+        -o "$IFACE" \
+        -j MASQUERADE
+    EOT
+  }
+
+  provisioner "local-exec" {
+    when = destroy
+
+    interpreter = ["sudo", "bash", "-c"]
+
+    command = <<-EOT
+      IFACE=$(ip route show default | awk '/default/ {print $5}')
+
+      iptables -t nat -D POSTROUTING \
+        -s ${self.triggers.cidr} \
+        -o "$IFACE" \
+        -j MASQUERADE || true
+    EOT
+  }
+}
