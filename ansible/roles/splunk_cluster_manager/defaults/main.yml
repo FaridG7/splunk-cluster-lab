@@ -28,5 +28,5 @@ splunk_cluster_pass4symmkey: ""
 
 # --- CM readiness polling -----------------------------------------------------
 # How long to wait for the CM to become healthy after restart before giving up.
-splunk_cm_readiness_retries: 20
-splunk_cm_readiness_delay: 10    # seconds between retries (20 * 10 = 200s max)
+splunk_cm_readiness_retries: 30
+splunk_cm_readiness_delay: 10
