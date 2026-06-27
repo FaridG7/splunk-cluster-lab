@@ -8,11 +8,6 @@ variable "tiers" {
     memory          = optional(number, 4096)
     vcpu            = optional(number, 4)
     capacity        = optional(number, 40)
-    firewall_rules = optional(list(object({
-      dst   = string
-      port  = number
-      proto = string
-    })), [])
   }))
 }
 variable "pool" {
