@@ -1,0 +1,20 @@
+{# =========================================================================== #}
+{# server.conf.j2 — splunk_install                                           #}
+{#                                                                            #}
+{# Written to system/local/server.conf BEFORE the first Splunk start.       #}
+{# This is the installation baseline — not a role config.                   #}
+{#                                                                            #}
+{# Stanzas owned here and nowhere else:                                      #}
+{#   [sslConfig]  — controls whether splunkd speaks TLS on port 8089         #}
+{#   [general]    — node identity used in cluster topology and MC views       #}
+{#                                                                            #}
+{# All other stanzas (clustering, license, deployment-server, etc.) are      #}
+{# written by their respective roles into etc/apps/role_*/local/server.conf  #}
+{# and merged by Splunk's config layering at runtime.                        #}
+{# =========================================================================== #}
+
+[sslConfig]
+enableSplunkdSSL = {{ splunk_enable_tls | lower }}
+
+[general]
+serverName = {{ inventory_hostname }}

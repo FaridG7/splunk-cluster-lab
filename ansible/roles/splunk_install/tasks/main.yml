@@ -20,6 +20,10 @@
   ansible.builtin.import_tasks: extract.yml
   tags: [install, extract]
 
+- name: Write base server.conf before first start
+  ansible.builtin.import_tasks: configure.yml
+  tags: [install, configure]
+
 - name: Bootstrap Splunk first run and admin password
   ansible.builtin.import_tasks: bootstrap.yml
   tags: [install, bootstrap]

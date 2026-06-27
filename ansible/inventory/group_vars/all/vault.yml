@@ -12,5 +12,5 @@
 # minimum, so an unmodified placeholder will fail the play loudly.
 # =============================================================================
 
-splunk_admin_password: "CHANGE_ME_before_vault_encrypt"
+splunk_admin_password: "masalan_secure_password1@3$"
 splunk_cluster_pass4symmkey: "your-secret-min-16-chars"

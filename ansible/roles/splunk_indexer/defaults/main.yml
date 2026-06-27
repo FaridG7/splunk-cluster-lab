@@ -8,7 +8,7 @@
 # The CM URI each peer registers to. Uses the first host in the
 # cluster_manager group — resolved at runtime by Ansible.
 # Do not hardcode an IP here; the group reference is topology-agnostic.
-splunk_cm_uri: "https://{{ groups['cluster_manager'][0] }}:8089"
+splunk_cm_uri: "{{ splunk_api_scheme }}://{{ groups['cluster_manager'][0] }}:8089"
 
 # --- Shared cluster secret ----------------------------------------------------
 # Must match splunk_cluster_pass4symmkey set in the CM role exactly.

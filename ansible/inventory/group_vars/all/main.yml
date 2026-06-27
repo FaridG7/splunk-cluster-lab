@@ -1,38 +1,32 @@
 ---
-# =============================================================================
-# group_vars/all — applies to every Splunk node.
-# Variables here override role defaults; host_vars / tier group_vars override
-# these. Keep only cluster-wide values here.
-# =============================================================================
-
-# --- Splunk user & group -------------------------------------------------------
+# --- Paths (must match splunk_common defaults) --------------------------------
+splunk_home: /opt/splunk
 splunk_user: splunk
 splunk_group: splunk
-splunk_user_uid: 1500
-splunk_user_gid: 1500
-
-# --- Directory layout ---------------------------------------------------------
-splunk_home: /opt/splunk
-splunk_var_dir: /opt/splunk/var
-splunk_db_dir: /opt/splunk/var/lib/splunk
-
-# --- ulimit targets (Splunk recommendations) ----------------------------------
-splunk_ulimit_open_files: 65535
-splunk_ulimit_max_procs: 16000
-
-# --- Kernel / OS tuning -------------------------------------------------------
-splunk_vm_max_map_count: 262144        # required for Splunk's memory-mapped files
-splunk_vm_swappiness: 10               # reduce swap aggressiveness
-splunk_net_core_somaxconn: 1024        # listen backlog for high-ingest nodes
-splunk_disable_thp: true               # Transparent Huge Pages harm Splunk perf
-
-# --- NTP / time ---------------------------------------------------------------
-#   Ubuntu 22.04 / 24.04  → systemd-timesyncd
-#   RHEL / Rocky 8 & 9    → chronyd
-splunk_ntp_service: systemd-timesyncd
-
+# --- Service ------------------------------------------------------------------
+splunk_service_name: splunk
+# --- Admin credentials --------------------------------------------------------
+# splunk_admin_username and splunk_admin_password come from vault.yml
+splunk_admin_username: admin
+# --- TLS ----------------------------------------------------------------------
+# Single source of truth for TLS across the entire cluster.
+# false  → plain HTTP on port 8089 (lab default)
+# true   → HTTPS on port 8089 (production)
+splunk_enable_tls: false
+# --- API scheme ---------------------------------------------------------------
+# Derived from splunk_enable_tls. Used in every URI task across all roles
+# so that switching TLS on/off requires changing only splunk_enable_tls above.
+#
+# This is the fix for the https:// hardcoding bug — every wait.yml uses
+# {{ splunk_api_scheme }}://host:8089/... instead of https://host:8089/...
+splunk_api_scheme: "{{ 'https' if splunk_enable_tls else 'http' }}"
+# --- Cluster shared secret ----------------------------------------------------
+# Referenced in splunk_cluster_manager, splunk_indexer, splunk_search_head.
+# The actual value lives in vault.yml.
+splunk_cluster_pass4symmkey: "{{ vault_cluster_pass4symmkey }}"
+# --- Management port ----------------------------------------------------------
+splunk_mgmt_port: 8089
 # --- Splunk install source ----------------------------------------------------
 splunk_archive_local_path: "~/Downloads/splunk-10.4.0-f798d4d49089-linux-amd64.tgz"
-
 # Re-staged on each node to /tmp/splunk.tgz (matches the role default).
 # splunk_archive_remote_path: /tmp/splunk.tgz

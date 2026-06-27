@@ -1,0 +1,21 @@
+---
+# =============================================================================
+# Write the base server.conf before the first Splunk start.
+# =============================================================================
+
+- name: Create system/local directory if not present
+  ansible.builtin.file:
+    path: "{{ splunk_home }}/etc/system/local"
+    state: directory
+    owner: "{{ splunk_user }}"
+    group: "{{ splunk_group }}"
+    mode: '0755'
+
+- name: Deploy base server.conf before first start
+  ansible.builtin.template:
+    src: server.conf.j2
+    dest: "{{ splunk_home }}/etc/system/local/server.conf"
+    owner: "{{ splunk_user }}"
+    group: "{{ splunk_group }}"
+    mode: '0600'
+    force: false

@@ -25,12 +25,12 @@
 
 - name: Poll CM /info endpoint until status is ready
   ansible.builtin.uri:
-    url: "https://{{ ansible_host }}:8089/services/cluster/manager/info\
+    url: "{{ splunk_api_scheme }}://{{ ansible_host }}:8089/services/cluster/manager/info\
           ?output_mode=json"
     method: GET
     user: "{{ splunk_admin_username }}"
     password: "{{ splunk_admin_password }}"
-    validate_certs: false          # TLS disabled in lab (splunk_enable_tls: false)
+    validate_certs: "{{ splunk_enable_tls }}"
     status_code: 200
     return_content: true
   register: cm_info
@@ -39,14 +39,4 @@
     (cm_info.json.entry[0].content.active_bundle is defined)
   retries: "{{ splunk_cm_readiness_retries }}"
   delay: "{{ splunk_cm_readiness_delay }}"
-  failed_when: cm_info.status not in [200, -1]   # -1 = connection refused, keep retrying
-
-- name: Report CM status
-  ansible.builtin.debug:
-    msg: >
-      Cluster Manager on {{ inventory_hostname }} is ready.
-      Mode       : {{ cm_info.json.entry[0].content.mode }}
-      RF         : {{ cm_info.json.entry[0].content.replication_factor }}
-      SF         : {{ cm_info.json.entry[0].content.search_factor }}
-      Active bundle: {{ cm_info.json.entry[0].content.active_bundle.checksum
-                        | default('none yet') }}
+  failed_when: cm_info.status not in [200, -1]

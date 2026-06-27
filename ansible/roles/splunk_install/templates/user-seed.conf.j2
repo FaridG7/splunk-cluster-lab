@@ -1,15 +1,3 @@
-{# =========================================================================== #}
-{# user-seed.conf.j2                                                           #}
-{#                                                                             #}
-{# Splunk consults this file ONLY on its very first start. It seeds the admin  #}
-{# account so `splunk start` can run non-interactively under Ansible. After    #}
-{# bootstrap Splunk removes/honours it no further, so re-deploying the file    #}
-{# cannot change an existing admin password (bootstrap.yml guards with force:  #}
-{# false regardless).                                                          #}
-{#                                                                             #}
-{# SEEDPASS must be a plaintext password. For SHA seeding use                   #}
-{# `password_seed_hash`. A home lab using the vault is fine with plaintext.     #}
-{# =========================================================================== #}
 [user_info]
 USERNAME = {{ splunk_admin_username }}
-SEEDPASS = {{ splunk_admin_password }}
+PASSWORD = {{ splunk_admin_password }}
