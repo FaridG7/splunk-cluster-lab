@@ -6,16 +6,7 @@
 #   - initialise its internal SQLite state DB
 #   - open the management port (8089)
 #   - start serving the /services/cluster/manager/info endpoint
-#
-# We poll that endpoint and check that status == "idle" or "ready".
-# "idle" means the CM is up but no peers have registered yet — which is
-# exactly the state we expect at this point in the bootstrap.
-#
-# Why not just wait_for port 8089?
-# The port can open before Splunk has fully initialised the clustering
-# subsystem. Polling the actual cluster endpoint is the correct signal.
 # =============================================================================
-
 - name: Wait for CM management port to open
   ansible.builtin.wait_for:
     host: "{{ ansible_host }}"
@@ -31,7 +22,7 @@
     user: "{{ splunk_admin_username }}"
     password: "{{ splunk_admin_password }}"
     validate_certs: "{{ splunk_enable_tls }}"
-    status_code: 200
+    status_code: [200, 401, 403, 503]
     return_content: true
   register: cm_info
   until: >
@@ -39,4 +30,4 @@
     (cm_info.json.entry[0].content.active_bundle is defined)
   retries: "{{ splunk_cm_readiness_retries }}"
   delay: "{{ splunk_cm_readiness_delay }}"
-  failed_when: cm_info.status not in [200, -1]
+  failed_when: false

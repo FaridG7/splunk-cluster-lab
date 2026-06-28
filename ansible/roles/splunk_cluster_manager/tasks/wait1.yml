@@ -1,0 +1,5 @@
+---
+- name: Ensure Splunk is started before deploying configuration
+  ansible.builtin.systemd:
+    name: "{{ splunk_service_name }}"
+    state: started

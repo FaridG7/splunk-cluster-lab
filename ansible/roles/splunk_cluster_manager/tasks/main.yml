@@ -19,16 +19,18 @@
   ansible.builtin.import_tasks: assert.yml
   tags: [always, assert]
 
+- name: Wait for the Splunk Service To Be Started
+  ansible.builtin.import_tasks: wait1.yml
+  tags: [cluster_manager, wait]
+
 - name: Deploy Cluster Manager configuration
   ansible.builtin.import_tasks: configure.yml
   tags: [cluster_manager, configure]
 
-# Force any pending handlers (i.e. the Splunk restart) to fire NOW
-# so the wait task below can poll a restarted — not pre-restart — process.
 - name: Flush handlers to restart Splunk if config changed
   ansible.builtin.meta: flush_handlers
   tags: [cluster_manager, configure]
 
 - name: Wait for Cluster Manager to be ready
-  ansible.builtin.import_tasks: wait.yml
+  ansible.builtin.import_tasks: wait2.yml
   tags: [cluster_manager, wait]
