@@ -1,16 +1,4 @@
 ---
-# =============================================================================
-# Deploy the indexer peer configuration.
-#
-# Stanza ownership:
-#   server.conf  → [clustering] peer stanza + [replication_port]
-#   inputs.conf  → [splunktcp] receiving port for forwarder data
-#
-# Both files go under etc/apps/role_indexer/local/ — never system/local/.
-# This is an indexer-only node so there are no other roles to conflict with,
-# but the pattern is consistent with mgmt-0 where conflict avoidance matters.
-# =============================================================================
-
 - name: Create role app directory for indexer
   ansible.builtin.file:
     path: "{{ splunk_home }}/etc/apps/role_indexer/local"
@@ -23,15 +11,6 @@
   ansible.builtin.template:
     src: server.conf.j2
     dest: "{{ splunk_home }}/etc/apps/role_indexer/local/server.conf"
-    owner: "{{ splunk_user }}"
-    group: "{{ splunk_group }}"
-    mode: '0600'
-  notify: Restart splunk
-
-- name: Deploy indexer inputs.conf (forwarder receiving port)
-  ansible.builtin.template:
-    src: inputs.conf.j2
-    dest: "{{ splunk_home }}/etc/apps/role_indexer/local/inputs.conf"
     owner: "{{ splunk_user }}"
     group: "{{ splunk_group }}"
     mode: '0600'

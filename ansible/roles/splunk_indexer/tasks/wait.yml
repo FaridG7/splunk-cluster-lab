@@ -1,21 +1,4 @@
 ---
-# =============================================================================
-# Wait for this peer to appear as "Up" in the CM's peer list.
-#
-# After a peer restarts with clustering config it contacts the CM and
-# registers itself. The CM then adds it to /services/cluster/manager/peers.
-# We poll that endpoint filtering by this peer's hostname until its status
-# field reads "Up".
-#
-# Why poll the CM rather than the peer itself?
-# The peer's own API becomes available before the CM has acknowledged the
-# registration. The CM's peer list is the authoritative source of truth for
-# whether the peer is actually part of the cluster.
-#
-# The CM host is resolved dynamically from the cluster_manager inventory
-# group — no hardcoded IPs.
-# =============================================================================
-
 - name: Wait for peer management port to open after restart
   ansible.builtin.wait_for:
     host: "{{ ansible_host }}"
@@ -25,7 +8,7 @@
 
 - name: Poll CM peer list until this peer appears as Up
   ansible.builtin.uri:
-    url: "https://{{ hostvars[groups['cluster_manager'][0]]['ansible_host'] }}:\
+    url: "{{ splunk_api_scheme }}://{{ hostvars[groups['cluster_manager'][0]]['ansible_host'] }}:\
           8089/services/cluster/manager/peers?output_mode=json"
     method: GET
     user: "{{ splunk_admin_username }}"
@@ -34,8 +17,6 @@
     status_code: 200
     return_content: true
   register: cm_peers
-  # The CM returns a list of peer entries. We look for an entry whose
-  # label matches this host and whose status is "Up".
   until: >
     cm_peers.status == 200 and
     cm_peers.json.entry |
@@ -44,14 +25,4 @@
       list | length > 0
   retries: "{{ splunk_peer_readiness_retries }}"
   delay: "{{ splunk_peer_readiness_delay }}"
-  failed_when: cm_peers.status not in [200, -1]
-
-- name: Report peer registration status
-  ansible.builtin.debug:
-    msg: >
-      Peer {{ inventory_hostname }} is registered and Up in the CM.
-      Registered peers so far: {{
-        cm_peers.json.entry |
-        map(attribute='content.label') |
-        list | join(', ')
-      }}
+  failed_when: cm_peers.status not in [200]

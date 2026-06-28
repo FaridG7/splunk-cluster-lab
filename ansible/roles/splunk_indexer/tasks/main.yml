@@ -1,21 +1,4 @@
 ---
-# =============================================================================
-# splunk_indexer — tasks/main.yml
-#
-# Execution order:
-#   1. assert    — fail fast if cluster secret or CM URI is missing
-#   2. configure — write peer server.conf and inputs.conf stanzas
-#   3. flush     — trigger restart NOW (not at play end) so wait.yml
-#                  polls the restarted process, not the pre-config one
-#   4. wait      — confirm this peer appears as "Up" in the CM peer list
-#                  before serial: 1 moves on to the next indexer
-#
-# The serial: 1 in the play means this entire task sequence runs to
-# completion on idx-0 before Ansible touches idx-1, then idx-2.
-# That gives the CM time to process each registration individually
-# and prevents a split-brain scenario during bootstrap.
-# =============================================================================
-
 - name: Assert required indexer variables are defined
   ansible.builtin.import_tasks: assert.yml
   tags: [always, assert]
