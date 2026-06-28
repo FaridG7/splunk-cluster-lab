@@ -1,9 +1,4 @@
 ---
-# =============================================================================
-# splunk_common — defaults
-# These are the lowest-priority vars. Override in group_vars or host_vars.
-# =============================================================================
-
 # --- Splunk user & group -------------------------------------------------------
 splunk_user: splunk
 splunk_group: splunk

@@ -1,10 +1,4 @@
 ---
-# =============================================================================
-# Assert CM-specific required variables.
-# The cluster secret is the most critical — an empty pass4SymmKey means
-# all cluster communication silently fails with auth errors.
-# =============================================================================
-
 - name: Assert splunk_cluster_pass4symmkey is set
   ansible.builtin.assert:
     that:

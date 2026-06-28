@@ -1,12 +1,4 @@
 ---
-# =============================================================================
-# Wait for the Cluster Manager to become ready.
-#
-# After a restart the CM needs time to:
-#   - initialise its internal SQLite state DB
-#   - open the management port (8089)
-#   - start serving the /services/cluster/manager/info endpoint
-# =============================================================================
 - name: Wait for CM management port to open
   ansible.builtin.wait_for:
     host: "{{ ansible_host }}"

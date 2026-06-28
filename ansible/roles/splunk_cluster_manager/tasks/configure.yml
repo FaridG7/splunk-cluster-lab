@@ -1,16 +1,4 @@
 ---
-# =============================================================================
-# Deploy the Cluster Manager configuration.
-#
-# Stanza ownership rule: this role writes ONLY to its own app directory.
-# It never touches system/local/server.conf or any other role's app dir.
-# Splunk merges all app configs at runtime — no conflicts possible.
-#
-# Stanzas owned by this role:
-#   [clustering]        — mode, RF, SF, shared secret, cluster label
-#   [replication_port]  — port peers use to stream bucket copies
-# =============================================================================
-
 - name: Create role app directory for cluster_manager
   ansible.builtin.file:
     path: "{{ splunk_home }}/etc/apps/role_cluster_manager/local"
@@ -27,3 +15,6 @@
     group: "{{ splunk_group }}"
     mode: '0600'
   notify: Restart splunk
+
+- name: Flush Handlers to avoid race conditions
+  ansible.builtin.meta: flush_handlers

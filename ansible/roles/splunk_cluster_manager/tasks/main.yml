@@ -1,36 +1,12 @@
 ---
-# =============================================================================
-# splunk_cluster_manager — tasks/main.yml
-#
-# Execution order matters here:
-#   1. assert    — fail fast on missing secrets
-#   2. configure — write the CM server.conf app stanza
-#   3. (handler fires here if config changed → Splunk restarts)
-#   4. flush     — force handler to run NOW, not at play end
-#   5. wait      — poll CM API until healthy before returning to site.yml
-#
-# The flush + wait pattern is the critical piece: without it, play 03
-# (indexers) would start immediately after this play returns, before the
-# CM has finished initialising its internal state. Peers connecting to a
-# CM that isn't ready yet fail to register and the cluster never forms.
-# =============================================================================
-
 - name: Assert required CM variables are defined
   ansible.builtin.import_tasks: assert.yml
   tags: [always, assert]
-
-- name: Wait for the Splunk Service To Be Started
-  ansible.builtin.import_tasks: wait1.yml
-  tags: [cluster_manager, wait]
 
 - name: Deploy Cluster Manager configuration
   ansible.builtin.import_tasks: configure.yml
   tags: [cluster_manager, configure]
 
-- name: Flush handlers to restart Splunk if config changed
-  ansible.builtin.meta: flush_handlers
-  tags: [cluster_manager, configure]
-
 - name: Wait for Cluster Manager to be ready
-  ansible.builtin.import_tasks: wait2.yml
+  ansible.builtin.import_tasks: wait.yml
   tags: [cluster_manager, wait]

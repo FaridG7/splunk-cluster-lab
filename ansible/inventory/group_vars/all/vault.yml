@@ -13,4 +13,4 @@
 # =============================================================================
 
 splunk_admin_password: "masalan_secure_password1@3$"
-splunk_cluster_pass4symmkey: "your-secret-min-16-chars"
+splunk_cluster_pass4symmkey: "0c5a8fd5-6ca3-453c-86eb-1eae6f5ad2ec"

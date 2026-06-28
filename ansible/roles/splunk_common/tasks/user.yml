@@ -1,10 +1,4 @@
 ---
-# =============================================================================
-# Create the splunk system user and group.
-# Explicit UID/GID ensures consistency across all nodes — critical for
-# shared filesystem scenarios and avoids subtle permission drift.
-# =============================================================================
-
 - name: Create splunk group
   ansible.builtin.group:
     name: "{{ splunk_group }}"

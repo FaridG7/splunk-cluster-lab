@@ -1,9 +1,4 @@
 ---
-# =============================================================================
-# Assert required variables before doing any real work.
-# Fail fast with a clear message rather than cryptic errors mid-play.
-# =============================================================================
-
 - name: Assert OS family is supported
   ansible.builtin.assert:
     that:

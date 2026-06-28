@@ -1,48 +1,19 @@
 ---
-# =============================================================================
-# First-run bootstrap.
-#
-# `splunk start` with no credentials would launch an interactive prompt for
-# an admin password, which hangs unattended plays. We avoid that by dropping
-# a user-seed.conf into SPLUNK_HOME/etc/system/local before the first start;
-# the CLI then picks up the seeded password and runs non-interactively.
-#
-# user-seed.conf is only honoured on the very first start, so writing it
-# unconditionally is safe and idempotent — on an already-bootstrapped node
-# it is simply ignored.
-# =============================================================================
-
-- name: Check if Splunk has already been bootstrapped
-  ansible.builtin.stat:
-    path: "{{ splunk_home }}/etc/system/local/user-seed.conf"
-  register: user_seed
-
-- name: Drop user-seed.conf with admin credentials
-  ansible.builtin.template:
-    src: user-seed.conf.j2
-    dest: "{{ splunk_home }}/etc/system/local/user-seed.conf"
-    owner: "{{ splunk_user }}"
-    group: "{{ splunk_group }}"
-    mode: '0600'
-    force: false
-  when: not user_seed.stat.exists
-
-- name: First start of Splunk (accepts license via --accept-license)
+- name: Enable Splunk boot-start (systemd)
   ansible.builtin.command:
-    cmd: "{{ splunk_home }}/bin/splunk start --accept-license --answer-yes --no-prompt"
+    cmd: "{{ splunk_home }}/bin/splunk enable boot-start -systemd-managed 1 -user splunk -group splunk --answer-yes --accept-license" 
+    creates: "/etc/systemd/system/{{ splunk_service_name }}.service"
   become: true
-  become_user: "{{ splunk_user }}"
-  environment:
-    SPLUNK_HOME: "{{ splunk_home }}"
-  register: splunk_start_result
-  changed_when: "'Starting Splunk' in splunk_start_result.stdout or 'The Splunk web interface is at' in splunk_start_result.stdout"
-  failed_when: >
-    splunk_start_result.rc != 0
-    and 'already running' not in splunk_start_result.stdout | lower
-  when: not user_seed.stat.exists
+  register: bootstart_result
+  when: splunk_enable_boot_start | bool
+  notify: Reload systemd
 
-- name: Note bootstrap skipped on already-configured node
-  ansible.builtin.debug:
-    msg: "user-seed.conf already present on {{ inventory_hostname }} — skipping first-start bootstrap."
-  when: user_seed.stat.exists
-  changed_when: false
+- name: Flush Handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Ensure Splunk service is enabled and started
+  ansible.builtin.systemd:
+    name: "{{ splunk_service_name }}"
+    enabled: true
+    state: started
+  when: splunk_enable_boot_start | bool

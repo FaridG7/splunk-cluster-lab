@@ -1,12 +1,4 @@
 ---
-# =============================================================================
-# Configure ulimits for the splunk user.
-# Written to /etc/security/limits.d/ so they apply to all sessions,
-# including the systemd service unit (which reads limits.conf).
-# Both soft and hard limits are set to the same value — Splunk
-# recommends not relying on soft limits being raised at runtime.
-# =============================================================================
-
 - name: Set open file descriptor limits for splunk user
   community.general.pam_limits:
     domain: "{{ splunk_user }}"

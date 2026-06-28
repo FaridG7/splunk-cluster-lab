@@ -1,9 +1,4 @@
 ---
-# =============================================================================
-# Assert required variables before doing any real work.
-# Fail fast with a clear message rather than cryptic errors mid-install.
-# =============================================================================
-
 - name: Assert exactly one Splunk archive source is configured
   ansible.builtin.assert:
     that:

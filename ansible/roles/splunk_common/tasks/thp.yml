@@ -1,14 +1,4 @@
 ---
-# =============================================================================
-# Disable Transparent Huge Pages (THP).
-# THP causes latency spikes and memory bloat in Splunk workloads.
-# Splunk's own pre-flight checks will warn if THP is enabled.
-#
-# Two steps are required:
-#   1. Disable at runtime (immediate effect, lost on reboot)
-#   2. Deploy a systemd unit to disable on every boot (persistent)
-# =============================================================================
-
 - name: Disable THP at runtime — enabled
   ansible.builtin.shell:
     cmd: echo never > /sys/kernel/mm/transparent_hugepage/enabled

@@ -1,9 +1,4 @@
 ---
-# =============================================================================
-# splunk_cluster_manager — defaults
-# Override in inventories/lab/group_vars/cluster_manager.yml
-# =============================================================================
-
 # --- Cluster identity ---------------------------------------------------------
 # The cluster label appears in the Monitoring Console and Splunk Web UI.
 splunk_cluster_label: splunk-lab-cluster

@@ -1,14 +1,4 @@
 ---
-# =============================================================================
-# Create the Splunk directory tree before the binary is installed.
-# Doing this here (not in splunk_install) means the splunk user owns
-# the directories from the start — no permission fixup needed later.
-#
-# Permissions follow the principle of least privilege:
-#   splunk_home  : 0755 — Splunk process and admins need traversal
-#   var/db dirs  : 0700 — only the splunk user should read index data
-# =============================================================================
-
 - name: Create SPLUNK_HOME
   ansible.builtin.file:
     path: "{{ splunk_home }}"

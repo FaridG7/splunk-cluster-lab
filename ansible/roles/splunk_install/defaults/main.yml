@@ -1,17 +1,9 @@
 ---
-# =============================================================================
-# splunk_install — defaults
-# Lowest-priority vars. Override in group_vars/all or per-tier group_vars.
-# =============================================================================
-
 # --- Splunk package source ----------------------------------------------------
 # Provide EXACTLY ONE of the two sources below. assert.yml enforces this.
 #
 #   splunk_archive_url         — pull the tarball from a remote HTTP(S) location
 #   splunk_archive_local_path  — copy a tarball already on the Ansible controller
-#
-# A home lab usually keeps the downloaded tarball on the controller and pushes
-# it out; that avoids every node hammering splunk.com.
 splunk_archive_url: ""
 splunk_archive_local_path: ""
 

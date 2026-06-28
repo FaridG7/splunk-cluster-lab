@@ -1,8 +1,4 @@
 ---
-# =============================================================================
-# Write the base server.conf before the first Splunk start.
-# =============================================================================
-
 - name: Create system/local directory if not present
   ansible.builtin.file:
     path: "{{ splunk_home }}/etc/system/local"
@@ -19,3 +15,13 @@
     group: "{{ splunk_group }}"
     mode: '0600'
     force: false
+
+- name: Drop user-seed.conf with admin credentials
+  ansible.builtin.template:
+    src: user-seed.conf.j2
+    dest: "{{ splunk_home }}/etc/system/local/user-seed.conf"
+    owner: "{{ splunk_user }}"
+    group: "{{ splunk_group }}"
+    mode: '0600'
+    force: false
+  when: not user_seed.stat.exists

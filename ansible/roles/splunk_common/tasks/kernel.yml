@@ -1,10 +1,4 @@
 ---
-# =============================================================================
-# Kernel parameter tuning via sysctl.
-# Using ansible.posix.sysctl writes to /etc/sysctl.d/ so settings
-# survive reboots. Each parameter is idempotent.
-# =============================================================================
-
 - name: Set vm.max_map_count for Splunk memory-mapped files
   ansible.posix.sysctl:
     name: vm.max_map_count
