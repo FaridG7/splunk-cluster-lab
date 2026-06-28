@@ -1,13 +1,8 @@
 ---
-# =============================================================================
-# splunk_search_head — defaults
-# Override in inventories/lab/group_vars/search_heads.yml
-# =============================================================================
-
 # --- Cluster connection -------------------------------------------------------
 # CM URI the SH registers to. Derived from the cluster_manager inventory
 # group at runtime — same pattern as splunk_indexer for consistency.
-splunk_cm_uri: "https://{{ groups['cluster_manager'][0] }}:8089"
+splunk_cm_uri: "{{ splunk_api_scheme }}://{{ hostvars[groups['cluster_manager'][0]]['ansible_host'] }}:8089"
 
 # --- Shared cluster secret ----------------------------------------------------
 # Must be identical across CM, all peers, and all search heads.

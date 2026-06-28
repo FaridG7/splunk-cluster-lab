@@ -1,7 +1,0 @@
-# default.meta — org_all_indexers_output
-# Required for Splunk to treat this directory as a valid app.
-# access = read : [ * ] makes the app readable by all roles on the DS.
-
-[]
-access = read : [ * ], write : [ admin ]
-export = system

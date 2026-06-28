@@ -1,5 +1,4 @@
 ---
 - name: Restart splunk
-  ansible.builtin.systemd:
-    name: "{{ splunk_service_name }}"
-    state: restarted
+  ansible.builtin.command:
+    cmd: "sudo /opt/splunk/bin/splunk restart"

@@ -1,23 +1,4 @@
 ---
-# =============================================================================
-# Deploy the Search Head configuration.
-#
-# Stanza ownership (role_search_head app dir):
-#   server.conf    → [clustering] searchhead mode + CM URI + secret
-#   distsearch.conf → cluster-aware distributed search config
-#   web.conf       → web port and TLS toggle
-#
-# All three files go under etc/apps/role_search_head/local/ — never
-# system/local/. Consistent with every other role in this playbook.
-#
-# Note on distsearch.conf:
-# In a cluster-aware SH the peer list is NOT hardcoded in distsearch.conf.
-# The SH discovers peers dynamically from the CM via the [clustering]
-# stanza in server.conf. We only need to enable cluster-aware mode.
-# Hardcoding indexer IPs in distsearch.conf is the old non-cluster pattern
-# and would conflict with the CM's authoritative peer list.
-# =============================================================================
-
 - name: Create role app directory for search_head
   ansible.builtin.file:
     path: "{{ splunk_home }}/etc/apps/role_search_head/local"
@@ -30,15 +11,6 @@
   ansible.builtin.template:
     src: server.conf.j2
     dest: "{{ splunk_home }}/etc/apps/role_search_head/local/server.conf"
-    owner: "{{ splunk_user }}"
-    group: "{{ splunk_group }}"
-    mode: '0600'
-  notify: Restart splunk
-
-- name: Deploy search head distsearch.conf
-  ansible.builtin.template:
-    src: distsearch.conf.j2
-    dest: "{{ splunk_home }}/etc/apps/role_search_head/local/distsearch.conf"
     owner: "{{ splunk_user }}"
     group: "{{ splunk_group }}"
     mode: '0600'

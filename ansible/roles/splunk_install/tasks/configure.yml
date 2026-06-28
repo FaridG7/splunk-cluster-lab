@@ -24,4 +24,3 @@
     group: "{{ splunk_group }}"
     mode: '0600'
     force: false
-  when: not user_seed.stat.exists
