@@ -39,3 +39,8 @@ splunk_enable_boot_start: true
 # `splunk enable boot-start` creates a unit named Splunkd.service (Enterprise).
 # Later plays notify this handler name to restart Splunk after config changes.
 splunk_service_name: splunk
+
+# How long systemd waits for splunkd to stop cleanly before sending SIGKILL.
+# 300 s (5 min) covers large indexers with heavy bucket activity.
+# Tune down to 120 s for lighter search heads or forwarders.
+splunk_systemd_timeout_stop_sec: 600

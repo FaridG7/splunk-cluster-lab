@@ -6,11 +6,7 @@
 # at SPLUNK_HOME/bin/splunk start, and enables it for multi-user.target.
 # Doing this via the Splunk CLI (rather than hand-rolling a unit) means we
 # track whatever invocation convention the installed Splunk version uses.
-#
-# We also pass -user "{{ splunk_user }}" so the generated unit runs Splunk
-# as the right account rather than the user invoking the command.
 # =============================================================================
-
 - name: Check if boot-start systemd unit already exists
   ansible.builtin.stat:
     path: "/etc/systemd/system/{{ splunk_service_name }}.service"
@@ -30,6 +26,34 @@
   when:
     - splunk_enable_boot_start | bool
     - not splunk_unit.stat.exists
+
+- name: Ensure systemd drop-in directory exists for Splunk service
+  ansible.builtin.file:
+    path: "/etc/systemd/system/{{ splunk_service_name }}.service.d"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  become: true
+  when: splunk_enable_boot_start | bool
+
+- name: Apply systemd drop-in override for Splunk shutdown tuning
+  ansible.builtin.copy:
+    dest: "/etc/systemd/system/{{ splunk_service_name }}.service.d/timeout-override.conf"
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      # Managed by Ansible — do not edit manually.
+      # Gives splunkd enough time to flush open buckets and drain connections
+      # before systemd escalates to SIGKILL, preventing the orphaned-process
+      # and unclean-shutdown symptoms seen when TimeoutStopSec is too short.
+      [Service]
+      TimeoutStopSec={{ splunk_systemd_timeout_stop_sec | default(300) }}
+      KillMode=control-group
+  become: true
+  notify: Reload systemd
+  when: splunk_enable_boot_start | bool
 
 - name: Reload systemd to pick up the new unit
   ansible.builtin.systemd:
