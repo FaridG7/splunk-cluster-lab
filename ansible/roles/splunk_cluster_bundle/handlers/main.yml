@@ -8,5 +8,5 @@
   become: true
   become_user: {{ splunk_user }}
   ansible.builtin.command:
-    cmd: "/opt/splunk/bin/splunk apply --answer-yes --accept-license -auth {{ splunk_admin_user }}:{{ splunk_admin_password }}"
+    cmd: "/opt/splunk/bin/splunk apply cluster-bundle --answer-yes --accept-license -auth {{ splunk_admin_user }}:{{ splunk_admin_password }}"
 
