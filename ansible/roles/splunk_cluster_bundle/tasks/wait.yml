@@ -1,0 +1,22 @@
+---
+- name: Wait for cluster bundle validation to succeed on all peers
+  ansible.builtin.command:
+    cmd: "{{ splunk_home }}/bin/splunk show cluster-bundle-status"
+  become: true
+  become_user: "{{ splunk_user }}"
+  register: bundle_status
+  changed_when: false
+  until: >
+    bundle_status.rc == 0 and
+    (
+      bundle_status.stdout | regex_findall('last_bundle_validation_status=success') | length
+    ) ==
+    (
+      bundle_status.stdout | regex_findall('last_bundle_validation_status=') | length
+    ) and
+    (
+      bundle_status.stdout | regex_findall('last_bundle_validation_status=') | length
+    ) > 0
+  retries: "{{ splunk_readiness_retries }}"
+  delay: "{{ splunk_readiness_delay }}"
+  failed_when: bundle_status.rc != 0

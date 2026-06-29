@@ -1,0 +1,8 @@
+---
+- name: Configure the Cluster Through Cluster Bundle
+  hosts: cluster_manager
+  become: true
+  gather_facts: false
+
+  roles:
+    - role: splunk_cluster_bundle

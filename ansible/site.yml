@@ -4,3 +4,4 @@
 - import_playbook: plays/02_cluster_manager.yml
 - import_playbook: plays/03_indexers.yml
 - import_playbook: plays/04_search_heads.yml
+- import_playbook: plays/05_cluster_bundle.yml

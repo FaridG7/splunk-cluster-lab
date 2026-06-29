@@ -1,0 +1,8 @@
+---
+- name: Restart splunk
+  ansible.builtin.command:
+    cmd: "sudo /opt/splunk/bin/splunk restart"
+
+- name: Invoke cluster bundle
+  ansible.builtin.command:
+        cmd: "sudo /opt/splunk/bin/splunk apply --answer-yes -auth {{ splunk_admin_user }}:{{ splunk_admin_password }}"

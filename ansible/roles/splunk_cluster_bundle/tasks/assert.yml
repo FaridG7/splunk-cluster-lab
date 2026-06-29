@@ -1,0 +1,28 @@
+---
+- name: Assert splunk_cluster_pass4symmkey is set
+  ansible.builtin.assert:
+    that:
+      - splunk_cluster_pass4symmkey is defined
+      - splunk_cluster_pass4symmkey | length >= 16
+    fail_msg: >
+      splunk_cluster_pass4symmkey must be set and at least 16 characters.
+      It must be the exact same value used in the splunk_cluster_manager role.
+      Store it in inventories/lab/group_vars/all/vault.yml.
+
+- name: Assert cluster_manager group is not empty
+  ansible.builtin.assert:
+    that:
+      - groups['cluster_manager'] | length > 0
+    fail_msg: >
+      The [cluster_manager] inventory group is empty.
+      Add mgmt-0 to [cluster_manager] in inventories/lab/roles.ini.
+      The indexer role derives the CM URI from this group at runtime.
+
+- name: Assert receiving port is a valid port number
+  ansible.builtin.assert:
+    that:
+      - splunk_receiving_port | int > 1024
+      - splunk_receiving_port | int < 65535
+    fail_msg: >
+      splunk_receiving_port must be between 1024 and 65535.
+      Got: {{ splunk_receiving_port }}

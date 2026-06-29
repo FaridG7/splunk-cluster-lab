@@ -1,0 +1,16 @@
+---
+- name: Assert required indexer variables are defined
+  ansible.builtin.import_tasks: assert.yml
+  tags: [always, assert]
+
+- name: Deploy indexer peer configuration
+  ansible.builtin.import_tasks: configure.yml
+  tags: [indexer, configure]
+
+- name: Flush handlers to restart Splunk if config changed
+  ansible.builtin.meta: flush_handlers
+  tags: [indexer, configure]
+
+- name: Wait for peers to appear as Up in the CM
+  ansible.builtin.import_tasks: wait.yml
+  tags: [indexer, wait]
