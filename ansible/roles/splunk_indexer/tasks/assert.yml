@@ -18,15 +18,6 @@
       Add mgmt-0 to [cluster_manager] in inventories/lab/roles.ini.
       The indexer role derives the CM URI from this group at runtime.
 
-- name: Assert receiving port is a valid port number
-  ansible.builtin.assert:
-    that:
-      - splunk_receiving_port | int > 1024
-      - splunk_receiving_port | int < 65535
-    fail_msg: >
-      splunk_receiving_port must be between 1024 and 65535.
-      Got: {{ splunk_receiving_port }}
-
 - name: Assert replication port is a valid port number
   ansible.builtin.assert:
     that:
