@@ -20,7 +20,7 @@ splunk_replication_port: 9887
 # pass4SymmKey authenticates all cluster communication.
 # MUST be overridden in vault.yml — empty default causes assert to fail loudly.
 splunk_cluster_pass4symmkey: ""
-
+splunk_indexer_discovery_pass4symmkey: ""
 # --- CM readiness polling -----------------------------------------------------
 # How long to wait for the CM to become healthy after restart before giving up.
 splunk_cm_readiness_retries: 20
