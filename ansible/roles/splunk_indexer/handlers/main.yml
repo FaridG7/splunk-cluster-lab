@@ -1,4 +1,5 @@
 ---
 - name: Restart splunk
+  become: true
   ansible.builtin.command:
-    cmd: "sudo /opt/splunk/bin/splunk restart"
+    cmd: "/opt/splunk/bin/splunk restart"
